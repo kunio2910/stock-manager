@@ -16,22 +16,22 @@
           </div>
 
           <div class="metric-grid" aria-label="Thong ke nhanh">
-            <div class="metric">
+            <button class="metric metric-filter" type="button" data-status-filter="all">
               <span>Tong ma</span>
               <strong id="totalStocks">0</strong>
-            </div>
-            <div class="metric">
+            </button>
+            <button class="metric metric-filter" type="button" data-status-filter="watching">
               <span>Dang theo doi</span>
               <strong id="watchingStocks">0</strong>
-            </div>
-            <div class="metric">
+            </button>
+            <button class="metric metric-filter" type="button" data-status-filter="hold">
               <span>Dang nam giu</span>
               <strong id="holdingStocks">0</strong>
-            </div>
-            <div class="metric">
+            </button>
+            <button class="metric metric-filter" type="button" data-status-filter="alert">
               <span>Can chu y</span>
               <strong id="alertStocks">0</strong>
-            </div>
+            </button>
           </div>
 
           <section class="holding-chart" aria-label="Bieu do ty trong nam giu">
@@ -47,51 +47,6 @@
             <div class="chart-legend" id="holdingLegend"></div>
           </section>
 
-          <form class="stock-form" id="stockForm">
-            <label>
-              Ma co phieu
-              <input id="symbolInput" name="symbol" autocomplete="off" maxlength="12" placeholder="VD: FPT" required />
-            </label>
-            <label>
-              Ten cong ty
-              <input id="nameInput" name="name" autocomplete="off" placeholder="FPT Corporation" required />
-            </label>
-            <div class="form-row">
-              <label>
-                San
-                <select id="exchangeInput" name="exchange">
-                  <option>HOSE</option>
-                  <option>HNX</option>
-                  <option>UPCOM</option>
-                  <option>NYSE</option>
-                  <option>NASDAQ</option>
-                </select>
-              </label>
-              <label>
-                Nganh
-                <input id="sectorInput" name="sector" autocomplete="off" placeholder="Cong nghe" />
-              </label>
-            </div>
-            <div class="form-row">
-              <label>
-                Gia hien tai
-                <input id="priceInput" name="price" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0" />
-              </label>
-            </div>
-            <label>
-              Trang thai
-              <select id="statusInput" name="status">
-                <option value="watching">Dang theo doi</option>
-                <option value="hold">Dang nam giu</option>
-                <option value="alert">Can chu y</option>
-              </select>
-            </label>
-            <label>
-              Ghi chu
-              <textarea id="noteInput" name="note" rows="3" placeholder="Ly do theo doi, vung mua, tin tuc can kiem tra..."></textarea>
-            </label>
-            <button class="primary-btn" type="submit" id="submitButton">Them ma</button>
-          </form>
         </aside>
 
         <section class="content-panel">
@@ -119,6 +74,7 @@
           <nav class="view-tabs" aria-label="Chuyen man hinh">
             <button class="tab-btn active" type="button" data-view="stocks">Danh sach co phieu</button>
             <button class="tab-btn" type="button" data-view="sales">Bao cao ban</button>
+            <button class="tab-btn" type="button" data-view="manage">Quan ly ma</button>
             <button class="tab-btn" type="button" data-view="assets">Tong tai san</button>
           </nav>
 
@@ -164,6 +120,54 @@
               <strong>Chua co giao dich ban</strong>
               <span>Khi ban mot muc mua, giao dich se xuat hien tai day.</span>
             </div>
+          </div>
+
+          <div class="manage-panel view-panel" id="manageView">
+            <form class="stock-form" id="stockForm">
+              <label>
+                Ma co phieu
+                <input id="symbolInput" name="symbol" autocomplete="off" maxlength="12" placeholder="VD: FPT" required />
+              </label>
+              <label>
+                Ten cong ty
+                <input id="nameInput" name="name" autocomplete="off" placeholder="FPT Corporation" required />
+              </label>
+              <div class="form-row">
+                <label>
+                  San
+                  <select id="exchangeInput" name="exchange">
+                    <option>HOSE</option>
+                    <option>HNX</option>
+                    <option>UPCOM</option>
+                    <option>NYSE</option>
+                    <option>NASDAQ</option>
+                  </select>
+                </label>
+                <label>
+                  Nganh
+                  <input id="sectorInput" name="sector" autocomplete="off" placeholder="Cong nghe" />
+                </label>
+              </div>
+              <div class="form-row">
+                <label>
+                  Gia hien tai
+                  <input id="priceInput" name="price" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0" />
+                </label>
+                <label>
+                  Trang thai
+                  <select id="statusInput" name="status">
+                    <option value="watching">Dang theo doi</option>
+                    <option value="hold">Dang nam giu</option>
+                    <option value="alert">Can chu y</option>
+                  </select>
+                </label>
+              </div>
+              <label>
+                Ghi chu
+                <textarea id="noteInput" name="note" rows="3" placeholder="Ly do theo doi, vung mua, tin tuc can kiem tra..."></textarea>
+              </label>
+              <button class="primary-btn" type="submit" id="submitButton">Them ma</button>
+            </form>
           </div>
 
           <div class="asset-panel view-panel" id="assetsView">

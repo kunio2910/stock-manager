@@ -97,6 +97,17 @@ textarea {
   border-radius: 8px;
   padding: 12px;
   background: #fbfcfa;
+  text-align: left;
+}
+
+.metric-filter {
+  cursor: pointer;
+}
+
+.metric-filter:hover,
+.metric-filter.active {
+  border-color: var(--accent);
+  background: var(--soft-green);
 }
 
 .metric span {
@@ -564,8 +575,13 @@ th {
   background: var(--soft-amber);
 }
 
-.asset-panel {
+.asset-panel,
+.manage-panel {
   padding: 18px 24px 24px;
+}
+
+.manage-panel .stock-form {
+  max-width: 820px;
 }
 
 .asset-form {

@@ -35,6 +35,7 @@ const assetsEmptyState = document.querySelector("#assetsEmptyState");
 const submitButton = document.querySelector("#submitButton");
 const tabButtons = document.querySelectorAll(".tab-btn");
 const viewPanels = document.querySelectorAll(".view-panel");
+const metricFilters = document.querySelectorAll(".metric-filter");
 const holdingPie = document.querySelector("#holdingPie");
 const holdingLegend = document.querySelector("#holdingLegend");
 const holdingChartModeText = document.querySelector("#holdingChartModeText");
@@ -97,6 +98,7 @@ form.addEventListener("submit", (event) => {
   fields.symbol.setCustomValidity("");
   form.reset();
   submitButton.textContent = "Them ma";
+  activeView = "stocks";
   saveData();
   render();
 });
@@ -104,6 +106,14 @@ form.addEventListener("submit", (event) => {
 searchInput.addEventListener("input", render);
 filterInput.addEventListener("change", render);
 refreshPricesButton.addEventListener("click", updatePricesFromVietstock);
+
+metricFilters.forEach((button) => {
+  button.addEventListener("click", () => {
+    filterInput.value = button.dataset.statusFilter;
+    activeView = "stocks";
+    render();
+  });
+});
 
 tabButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -217,6 +227,8 @@ tableBody.addEventListener("click", (event) => {
   fields.status.value = stock.status;
   fields.note.value = stock.note;
   submitButton.textContent = "Cap nhat ma";
+  activeView = "manage";
+  renderViews();
   fields.symbol.focus();
 });
 
@@ -841,6 +853,7 @@ function updateMetrics() {
   document.querySelector("#watchingStocks").textContent = stocks.filter((stock) => stock.status === "watching").length;
   document.querySelector("#holdingStocks").textContent = stocks.filter((stock) => stock.status === "hold").length;
   document.querySelector("#alertStocks").textContent = stocks.filter((stock) => stock.status === "alert").length;
+  metricFilters.forEach((button) => button.classList.toggle("active", button.dataset.statusFilter === filterInput.value));
 }
 
 function calculateLotSummary(stock) {
