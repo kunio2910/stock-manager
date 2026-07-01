@@ -1176,11 +1176,7 @@ async function loadDataFromCloud() {
   if (!GOOGLE_SHEETS_API_URL) return;
 
   try {
-    const response = await fetch(`${GOOGLE_SHEETS_API_URL}?t=${Date.now()}`, { cache: "no-store" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-    const raw = await response.text();
-    const cloudData = raw ? JSON.parse(raw) : {};
+    const cloudData = await loadCloudDataJsonp();
 
     if (isEmptyCloudData(cloudData)) {
       await saveDataToCloud();
@@ -1203,18 +1199,39 @@ async function loadDataFromCloud() {
 async function saveDataToCloud() {
   if (!GOOGLE_SHEETS_API_URL) return;
 
-  const response = await fetch(GOOGLE_SHEETS_API_URL, {
+  await fetch(GOOGLE_SHEETS_API_URL, {
     method: "POST",
+    mode: "no-cors",
     body: JSON.stringify(getAppData()),
   });
-
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
-  }
 }
 
 function isEmptyCloudData(data) {
   return !data || (!Array.isArray(data.stocks) && !Array.isArray(data.sales) && !Array.isArray(data.assets));
+}
+
+function loadCloudDataJsonp() {
+  return new Promise((resolve, reject) => {
+    const callbackName = `stockDeskCloudCallback_${Date.now()}`;
+    const script = document.createElement("script");
+    const cleanup = () => {
+      delete window[callbackName];
+      script.remove();
+    };
+
+    window[callbackName] = (data) => {
+      cleanup();
+      resolve(data || {});
+    };
+
+    script.onerror = () => {
+      cleanup();
+      reject(new Error("Khong tai duoc Google Sheets JSONP"));
+    };
+
+    script.src = `${GOOGLE_SHEETS_API_URL}?callback=${callbackName}&t=${Date.now()}`;
+    document.body.append(script);
+  });
 }
 
 render();
