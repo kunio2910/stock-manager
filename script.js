@@ -1,5 +1,7 @@
 const STORAGE_KEY = "stock-desk-items";
 const ASSET_IMPORT_VERSION = 1;
+const GOOGLE_SHEETS_API_URL =
+  "https://script.google.com/macros/s/AKfycbxL-xGSo45yagueen_Lfct7BST6ITKOxTvQs5ymgx1t5w3L7UxDVZdRcc5L5bDqSGK7/exec";
 
 const statusLabels = {
   watching: "Dang theo doi",
@@ -14,6 +16,8 @@ let sellingLot = null;
 let editingAssetId = null;
 let activeView = "stocks";
 let holdingChartMode = "quantity";
+let cloudSaveTimer = null;
+let isApplyingCloudData = false;
 const expandedStocks = new Set();
 
 const form = document.querySelector("#stockForm");
@@ -1147,8 +1151,71 @@ function createId() {
 }
 
 function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ stocks, sales, assets, assetImportVersion: ASSET_IMPORT_VERSION }));
+  const data = getAppData();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+  if (!isApplyingCloudData) {
+    scheduleCloudSave();
+  }
 }
 
-saveData();
+function getAppData() {
+  return { stocks, sales, assets, assetImportVersion: ASSET_IMPORT_VERSION };
+}
+
+function scheduleCloudSave() {
+  window.clearTimeout(cloudSaveTimer);
+  cloudSaveTimer = window.setTimeout(() => {
+    saveDataToCloud().catch((error) => {
+      console.warn("Khong luu duoc Google Sheets", error);
+    });
+  }, 500);
+}
+
+async function loadDataFromCloud() {
+  if (!GOOGLE_SHEETS_API_URL) return;
+
+  try {
+    const response = await fetch(`${GOOGLE_SHEETS_API_URL}?t=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const raw = await response.text();
+    const cloudData = raw ? JSON.parse(raw) : {};
+
+    if (isEmptyCloudData(cloudData)) {
+      await saveDataToCloud();
+      return;
+    }
+
+    isApplyingCloudData = true;
+    stocks = Array.isArray(cloudData.stocks) ? cloudData.stocks.map(normalizeStock) : [];
+    sales = Array.isArray(cloudData.sales) ? cloudData.sales.map(normalizeSale) : [];
+    assets = Array.isArray(cloudData.assets) ? cloudData.assets.map(normalizeAsset) : [];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(getAppData()));
+    isApplyingCloudData = false;
+    render();
+  } catch (error) {
+    isApplyingCloudData = false;
+    console.warn("Khong tai duoc Google Sheets, dang dung du lieu local", error);
+  }
+}
+
+async function saveDataToCloud() {
+  if (!GOOGLE_SHEETS_API_URL) return;
+
+  const response = await fetch(GOOGLE_SHEETS_API_URL, {
+    method: "POST",
+    body: JSON.stringify(getAppData()),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+}
+
+function isEmptyCloudData(data) {
+  return !data || (!Array.isArray(data.stocks) && !Array.isArray(data.sales) && !Array.isArray(data.assets));
+}
+
 render();
+loadDataFromCloud();
