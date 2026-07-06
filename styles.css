@@ -286,6 +286,162 @@ button {
   font-size: 13px;
 }
 
+.trade-calendar-card {
+  display: grid;
+  gap: 12px;
+}
+
+.trade-calendar-card h2 {
+  margin-bottom: 4px;
+}
+
+.trade-calendar-head {
+  display: grid;
+  grid-template-columns: 32px 1fr 32px;
+  align-items: center;
+  gap: 8px;
+}
+
+.trade-calendar-head strong {
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.calendar-nav-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--accent);
+  background: #fff;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.trade-calendar-weekdays,
+.trade-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.trade-calendar-weekdays span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.trade-calendar-blank,
+.trade-calendar-day {
+  min-height: 42px;
+}
+
+.trade-calendar-day {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: #fff;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.trade-calendar-day small {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.trade-calendar-day.has-trade {
+  border-color: rgba(8, 127, 91, 0.32);
+  background: #f1fbf7;
+}
+
+.trade-calendar-day.has-trade.profit-negative {
+  border-color: rgba(240, 45, 69, 0.28);
+  background: #fff5f6;
+}
+
+.trade-calendar-day.selected {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 10px 18px rgba(8, 127, 91, 0.18);
+}
+
+.trade-calendar-day.selected small {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.trade-calendar-details {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.trade-calendar-details > strong,
+.trade-empty {
+  display: block;
+}
+
+.trade-empty {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.trade-detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.trade-detail-head strong {
+  color: var(--ink);
+}
+
+.trade-calendar-details ul {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trade-calendar-details li {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) 0.9fr 0.8fr 0.9fr;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfcff;
+}
+
+.trade-calendar-details li div {
+  min-width: 0;
+}
+
+.trade-calendar-details li span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.trade-calendar-details li strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+}
+
 .holding-chart {
   display: grid;
   gap: 14px;
@@ -526,13 +682,8 @@ button {
   background: linear-gradient(135deg, #f7fffb, #edf9f4);
 }
 
-.summary-card.profit,
-.summary-card.today {
+.summary-card.profit {
   background: linear-gradient(135deg, #fff9fb, #fff0f2);
-}
-
-.summary-card.cash {
-  background: linear-gradient(135deg, #fffaf0, #fff5df);
 }
 
 .summary-icon {
@@ -553,13 +704,8 @@ button {
   background: #35b86f;
 }
 
-.profit .summary-icon,
-.today .summary-icon {
+.profit .summary-icon {
   background: #ff6b7a;
-}
-
-.cash .summary-icon {
-  background: #ffa83d;
 }
 
 .summary-card span,
@@ -611,12 +757,6 @@ button {
 .portfolio-tabs button.active {
   color: var(--accent);
   box-shadow: inset 0 -3px 0 var(--accent);
-}
-
-.table-tools {
-  display: flex;
-  gap: 8px;
-  margin-left: auto;
 }
 
 table {
@@ -765,10 +905,18 @@ td {
 }
 
 .action-cell {
-  display: flex;
+  white-space: nowrap;
+  text-align: right;
+  vertical-align: middle;
+}
+
+.action-button-row {
+  display: inline-flex;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 .icon-btn,
@@ -789,7 +937,9 @@ td {
 }
 
 .action-add-btn {
+  flex: 0 0 auto;
   min-height: 28px;
+  min-width: 48px;
   border-radius: 6px;
   padding: 4px 8px;
   color: #fff;
@@ -799,7 +949,9 @@ td {
 }
 
 .action-delete-btn {
+  flex: 0 0 auto;
   min-height: 28px;
+  min-width: 42px;
   border-radius: 6px;
   padding: 4px 8px;
   color: #fff;
@@ -954,10 +1106,13 @@ td {
 }
 
 .lots-list {
-  min-width: 920px;
+  width: 100%;
+  min-width: 980px;
   max-height: 320px;
-  overflow-y: auto;
+  overflow: auto;
   display: block;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .lots-list thead,
@@ -972,6 +1127,30 @@ td {
   position: sticky;
   top: 0;
   z-index: 1;
+}
+
+.lots-list th:nth-child(1),
+.lots-list td:nth-child(1) {
+  width: 118px;
+  min-width: 118px;
+}
+
+.lots-list th:nth-child(2),
+.lots-list td:nth-child(2) {
+  width: 120px;
+  min-width: 120px;
+}
+
+.lots-list th:nth-child(3),
+.lots-list td:nth-child(3) {
+  width: 92px;
+  min-width: 92px;
+}
+
+.lots-list th:nth-child(9),
+.lots-list td:nth-child(9) {
+  width: 128px;
+  min-width: 128px;
 }
 
 .lot-row td {
@@ -1331,6 +1510,10 @@ textarea {
     padding: 16px;
   }
 
+  .trade-calendar-details li {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .toolbar {
     position: static;
     min-height: 0;
@@ -1356,17 +1539,134 @@ textarea {
   .table-wrap {
     max-width: calc(100vw - 24px);
     margin: 0 12px 18px;
-    overflow-x: auto;
+    overflow: visible;
     -webkit-overflow-scrolling: touch;
   }
 
   .portfolio-table {
-    min-width: 1080px;
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .portfolio-table thead {
+    display: none;
+  }
+
+  .portfolio-table tbody {
+    display: grid;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .portfolio-table tr.stock-row {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: inset 3px 0 0 var(--stock-accent, var(--accent));
+  }
+
+  .portfolio-table tr.stock-row td {
+    display: block;
+    border-bottom: 0;
+    padding: 0;
+  }
+
+  .portfolio-table tr.stock-row td:nth-child(1) {
+    grid-row: span 4;
+  }
+
+  .portfolio-table tr.stock-row td:nth-child(2) {
+    min-width: 0;
+  }
+
+  .portfolio-table tr.stock-row td:nth-child(n + 3):nth-child(-n + 10) {
+    display: grid;
+    grid-template-columns: minmax(98px, 44%) minmax(0, 1fr);
+    grid-column: 1 / -1;
+    align-items: baseline;
+    gap: 10px;
+    min-height: 28px;
+    font-size: 14px;
+  }
+
+  .portfolio-table tr.stock-row td:nth-child(n + 3):nth-child(-n + 10)::before {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .portfolio-table tr.stock-row td:nth-child(3)::before {
+    content: "Sàn";
+  }
+
+  .portfolio-table tr.stock-row td:nth-child(4)::before {
+    content: "Số lượng";
+  }
+
+  .portfolio-table tr.stock-row td:nth-child(5)::before {
+    content: "Giá vốn TB";
+  }
+
+  .portfolio-table tr.stock-row td:nth-child(6)::before {
+    content: "Giá hiện tại";
+  }
+
+  .portfolio-table tr.stock-row td:nth-child(7)::before {
+    content: "Giá trị vốn";
+  }
+
+  .portfolio-table tr.stock-row td:nth-child(8)::before {
+    content: "Giá trị hiện tại";
+  }
+
+  .portfolio-table tr.stock-row td:nth-child(9)::before {
+    content: "Lãi / Lỗ";
+  }
+
+  .portfolio-table tr.stock-row td:nth-child(10)::before {
+    content: "Tỷ lệ";
+  }
+
+  .portfolio-table tr.stock-row .action-cell {
+    grid-column: 1 / -1;
+    text-align: left;
+    padding-top: 4px;
+  }
+
+  .portfolio-table tr.stock-row .action-button-row {
+    justify-content: flex-start;
+  }
+
+  .portfolio-table tr.lots-detail-row {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .portfolio-table tr.lots-detail-row > td {
+    display: block;
+    min-width: 1040px;
+    border-bottom: 0;
+    padding: 0;
+  }
+
+  .portfolio-table .symbol-text {
+    font-size: 18px;
+  }
+
+  .portfolio-table .company-name {
+    font-size: 15px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
   }
 
   .portfolio-tabs {
     gap: 18px;
-    min-width: 760px;
     overflow-x: auto;
     white-space: nowrap;
   }

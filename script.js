@@ -18,6 +18,8 @@ let addingLotStockId = null;
 let editingAssetId = null;
 let activeView = "stocks";
 let holdingChartMode = "quantity";
+let tradeCalendarMonthDate = null;
+let selectedTradeDate = null;
 let cloudSaveTimer = null;
 let isApplyingCloudData = false;
 let settings = loadSettings();
@@ -67,6 +69,11 @@ const quickStatusInput = document.querySelector("#quickStatusInput");
 const moneyVisibilityInput = document.querySelector("#moneyVisibilityInput");
 const collapsibleToggles = document.querySelectorAll(".collapsible-toggle");
 const sidebarToggleButton = document.querySelector("#sidebarToggleButton");
+const tradeCalendarMonth = document.querySelector("#tradeCalendarMonth");
+const tradeCalendarGrid = document.querySelector("#tradeCalendarGrid");
+const tradeCalendarDetails = document.querySelector("#tradeCalendarDetails");
+const tradeCalendarPrev = document.querySelector("#tradeCalendarPrev");
+const tradeCalendarNext = document.querySelector("#tradeCalendarNext");
 
 const fields = {
   symbol: document.querySelector("#symbolInput"),
@@ -162,6 +169,24 @@ collapsibleToggles.forEach((button) => {
     button.setAttribute("aria-expanded", String(isOpen));
   });
 });
+
+if (tradeCalendarPrev) {
+  tradeCalendarPrev.addEventListener("click", () => shiftTradeCalendarMonth(-1));
+}
+
+if (tradeCalendarNext) {
+  tradeCalendarNext.addEventListener("click", () => shiftTradeCalendarMonth(1));
+}
+
+if (tradeCalendarGrid) {
+  tradeCalendarGrid.addEventListener("click", (event) => {
+    const button = event.target.closest(".trade-calendar-day");
+    if (!button?.dataset.date) return;
+    selectedTradeDate = button.dataset.date;
+    tradeCalendarMonthDate = createDateFromKey(selectedTradeDate);
+    renderTradeCalendar();
+  });
+}
 
 assetFromInput.addEventListener("change", renderAssets);
 assetToInput.addEventListener("change", renderAssets);
@@ -617,6 +642,7 @@ function render() {
   emptyState.hidden = filteredStocks.length > 0;
   renderSales();
   renderAssets();
+  renderTradeCalendar();
   renderHoldingChart();
   renderViews();
   updateMetrics();
@@ -717,7 +743,7 @@ function createFireAntChart(stock) {
   const title = document.createElement("div");
   title.className = "lot-chart-title";
   title.innerHTML = `
-    <strong>Bieu do FireAnt</strong>
+    <strong>Biểu đồ FireAnt</strong>
     <span>${getFireAntSymbol(stock)}</span>
   `;
 
@@ -729,7 +755,7 @@ function createFireAntChart(stock) {
   svg.classList.add("fireant-chart-svg");
   svg.setAttribute("viewBox", "0 0 760 260");
   svg.setAttribute("role", "img");
-  svg.setAttribute("aria-label", `Bieu do FireAnt cua ${stock.symbol}`);
+  svg.setAttribute("aria-label", `Biểu đồ FireAnt của ${stock.symbol}`);
 
   wrapper.append(title, svg, status);
   loadFireAntChart(stock, wrapper, svg, status);
@@ -1186,6 +1212,138 @@ function renderSales() {
   salesEmptyState.hidden = sales.length > 0;
 }
 
+function renderTradeCalendar() {
+  if (!tradeCalendarGrid || !tradeCalendarMonth || !tradeCalendarDetails) return;
+
+  const trades = getCalendarTrades();
+  const groupedTrades = trades.reduce((groups, trade) => {
+    if (!groups.has(trade.date)) groups.set(trade.date, []);
+    groups.get(trade.date).push(trade);
+    return groups;
+  }, new Map());
+
+  if (!selectedTradeDate) {
+    selectedTradeDate = trades[0]?.date || today();
+  }
+  if (!tradeCalendarMonthDate) {
+    tradeCalendarMonthDate = createDateFromKey(selectedTradeDate);
+  }
+
+  const year = tradeCalendarMonthDate.getFullYear();
+  const month = tradeCalendarMonthDate.getMonth();
+  const monthStart = new Date(year, month, 1);
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const leadingBlankDays = (monthStart.getDay() + 6) % 7;
+  tradeCalendarMonth.textContent = new Intl.DateTimeFormat("vi-VN", { month: "long", year: "numeric" }).format(monthStart);
+  tradeCalendarGrid.innerHTML = "";
+
+  for (let index = 0; index < leadingBlankDays; index += 1) {
+    const blank = document.createElement("span");
+    blank.className = "trade-calendar-blank";
+    tradeCalendarGrid.append(blank);
+  }
+
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const date = new Date(year, month, day);
+    const dateKey = toDateKey(date);
+    const dayTrades = groupedTrades.get(dateKey) || [];
+    const dayProfit = dayTrades.reduce((total, trade) => total + trade.profit, 0);
+    const button = document.createElement("button");
+    button.className = "trade-calendar-day";
+    button.type = "button";
+    button.dataset.date = dateKey;
+    button.classList.toggle("has-trade", dayTrades.length > 0);
+    button.classList.toggle("selected", selectedTradeDate === dateKey);
+    if (dayTrades.length) button.classList.add(getProfitClass(dayProfit));
+    button.innerHTML = `
+      <span>${day}</span>
+      ${dayTrades.length ? `<small>${dayTrades.length} GD</small>` : ""}
+    `;
+    tradeCalendarGrid.append(button);
+  }
+
+  renderTradeCalendarDetails(groupedTrades.get(selectedTradeDate) || []);
+}
+
+function renderTradeCalendarDetails(dayTrades) {
+  if (!dayTrades.length) {
+    tradeCalendarDetails.innerHTML = `
+      <strong>${formatDate(selectedTradeDate)}</strong>
+      <span class="trade-empty">Không có giao dịch mua trong ngày này.</span>
+    `;
+    return;
+  }
+
+  const totalQuantity = dayTrades.reduce((total, trade) => total + trade.quantity, 0);
+  const totalProfit = dayTrades.reduce((total, trade) => total + trade.profit, 0);
+  const items = dayTrades
+    .map(
+      (trade) => `
+        <li>
+          <div>
+            <strong>${trade.symbol}</strong>
+            <span>${trade.name}</span>
+          </div>
+          <div>
+            <span>Giá mua</span>
+            <strong>${formatNumber(trade.buyPrice)}</strong>
+          </div>
+          <div>
+            <span>Khối lượng</span>
+            <strong>${formatNumber(trade.quantity)}</strong>
+          </div>
+          <div class="${getProfitClass(trade.profit)}">
+            <span>Lời/lỗ</span>
+            <strong>${formatProfit(trade.profit)}</strong>
+          </div>
+        </li>
+      `,
+    )
+    .join("");
+
+  tradeCalendarDetails.innerHTML = `
+    <div class="trade-detail-head">
+      <strong>${formatDate(selectedTradeDate)}</strong>
+      <span>${formatNumber(totalQuantity)} CP · ${formatProfit(totalProfit)}</span>
+    </div>
+    <ul>${items}</ul>
+  `;
+}
+
+function getCalendarTrades() {
+  return stocks
+    .flatMap((stock) =>
+      stock.lots.map((lot) => {
+        const quantity = Number(lot.quantity || 0);
+        const buyPrice = Number(lot.buyPrice || 0);
+        const result = calculateProfit(quantity, buyPrice, Number(stock.price || 0));
+        return {
+          date: normalizeAssetDateValue(lot.buyDate),
+          symbol: stock.symbol,
+          name: stock.name,
+          quantity,
+          buyPrice,
+          profit: result.profit,
+        };
+      }),
+    )
+    .filter((trade) => trade.date && trade.quantity > 0)
+    .sort((a, b) => new Date(`${b.date}T00:00:00`) - new Date(`${a.date}T00:00:00`));
+}
+
+function shiftTradeCalendarMonth(delta) {
+  if (!tradeCalendarMonthDate) {
+    tradeCalendarMonthDate = createDateFromKey(selectedTradeDate || today());
+  }
+  tradeCalendarMonthDate = new Date(tradeCalendarMonthDate.getFullYear(), tradeCalendarMonthDate.getMonth() + delta, 1);
+  const monthTrade = getCalendarTrades().find((trade) => {
+    const tradeDate = createDateFromKey(trade.date);
+    return tradeDate.getFullYear() === tradeCalendarMonthDate.getFullYear() && tradeDate.getMonth() === tradeCalendarMonthDate.getMonth();
+  });
+  selectedTradeDate = monthTrade?.date || toDateKey(tradeCalendarMonthDate);
+  renderTradeCalendar();
+}
+
 function renderAssets() {
   assetsTable.innerHTML = "";
   const filteredAssets = getFilteredAssets();
@@ -1408,8 +1566,6 @@ function updateMetrics() {
   const totalProfitPercent = totalCost ? (totalProfit / totalCost) * 100 : null;
   const latestAsset = [...assets].sort((a, b) => new Date(b.time) - new Date(a.time))[0];
   const totalCapital = Number(latestAsset?.value || totalCost || totalValue || 0);
-  const cash = Math.max(totalCapital - totalValue, 0);
-  const cashRate = totalCapital ? (cash / totalCapital) * 100 : 0;
   const holdingCount = stocks.filter((stock) => stock.status === "hold").length;
   const watchingCount = stocks.filter((stock) => stock.status === "watching").length;
   const alertCount = stocks.filter((stock) => stock.status === "alert").length;
@@ -1420,21 +1576,12 @@ function updateMetrics() {
   setText("#alertStocks", alertCount);
   setText("#portfolioCount", holdingCount);
   setText("#watchingCountInline", watchingCount);
-  setText("#totalCapitalValue", formatPlainCurrency(totalCapital));
-  setText("#currentPortfolioValue", formatPlainCurrency(totalValue));
-  setText("#totalProfitValue", formatProfit(totalProfit));
-  setText("#totalProfitPercent", formatPercent(totalProfitPercent));
   setText("#capitalCardValue", formatPlainCurrency(totalCapital));
   setText("#valueCardValue", formatPlainCurrency(totalValue));
   setText("#profitCardValue", formatProfit(totalProfit));
   setText("#profitCardPercent", formatPercent(totalProfitPercent));
-  setText("#cashRateValue", `${cashRate.toFixed(1)}%`);
-  setText("#cashValue", formatCurrency(cash));
-  setText("#todayProfitValue", formatProfit(totalProfit));
-  setText("#todayProfitPercent", formatPercent(totalProfitPercent));
-  setText("#overviewUpdatedAt", latestAsset ? `${formatDate(latestAsset.time)} 08:30` : new Date().toLocaleDateString("vi-VN"));
 
-  document.querySelectorAll("#totalProfitValue, #profitCardValue, #profitCardPercent, #todayProfitValue, #todayProfitPercent").forEach((item) => {
+  document.querySelectorAll("#profitCardValue, #profitCardPercent").forEach((item) => {
     item.classList.remove("profit-positive", "profit-negative", "profit-neutral");
     item.classList.add(getProfitClass(totalProfit));
   });
@@ -1510,7 +1657,7 @@ function formatNumber(value) {
 
 function formatCurrency(value) {
   if (value === null || value === undefined || value === "" || Number.isNaN(value)) return "-";
-  return `${new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(Math.round(value))} VNĐ`;
+  return `${new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(Math.round(value))} VN\u0110`;
 }
 
 function formatPlainCurrency(value) {
@@ -1522,7 +1669,7 @@ function formatProfit(value, includeCurrency = false) {
   if (value === null || value === undefined || Number.isNaN(value)) return "-";
   const prefix = value > 0 ? "+" : "";
   const formatted = new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(Math.round(value));
-  return `${prefix}${formatted}${includeCurrency ? " VNĐ" : ""}`;
+  return `${prefix}${formatted}${includeCurrency ? " VN\u0110" : ""}`;
 }
 
 function formatPercent(value) {
@@ -1581,6 +1728,14 @@ function today() {
 function toDateInputValue(date) {
   const offsetMs = date.getTimezoneOffset() * 60000;
   return new Date(date.getTime() - offsetMs).toISOString().slice(0, 10);
+}
+
+function toDateKey(date) {
+  return toDateInputValue(date);
+}
+
+function createDateFromKey(value) {
+  return new Date(`${value || today()}T00:00:00`);
 }
 
 function normalizeAssetDateValue(value) {

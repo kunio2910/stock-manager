@@ -2,9 +2,10 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stock Desk</title>
-    <link rel="stylesheet" href="./styles.css?v=20260706-3" />
+    <link rel="stylesheet" href="./styles.css?v=20260706-8" />
   </head>
   <body class="sidebar-collapsed">
     <main class="app-shell">
@@ -33,25 +34,24 @@
       </aside>
 
       <aside class="overview-panel" aria-label="Tổng quan danh mục">
-        <section class="overview-card">
-          <h2>TỔNG QUAN DANH MỤC</h2>
-          <div class="overview-metric account-money">
-            <span>Tổng vốn</span>
-            <strong id="totalCapitalValue">0</strong>
-            <small>VND</small>
+        <section class="overview-card trade-calendar-card">
+          <h2>LỊCH GIAO DỊCH</h2>
+          <div class="trade-calendar-head">
+            <button class="calendar-nav-btn" type="button" id="tradeCalendarPrev" aria-label="Tháng trước">‹</button>
+            <strong id="tradeCalendarMonth">--</strong>
+            <button class="calendar-nav-btn" type="button" id="tradeCalendarNext" aria-label="Tháng sau">›</button>
           </div>
-          <div class="overview-metric account-money">
-            <span>Giá trị hiện tại</span>
-            <strong id="currentPortfolioValue">0</strong>
-            <small>VND</small>
+          <div class="trade-calendar-weekdays" aria-hidden="true">
+            <span>T2</span>
+            <span>T3</span>
+            <span>T4</span>
+            <span>T5</span>
+            <span>T6</span>
+            <span>T7</span>
+            <span>CN</span>
           </div>
-          <div class="overview-metric danger account-money">
-            <span>Lãi / Lỗ</span>
-            <strong id="totalProfitValue">0</strong>
-            <small id="totalProfitPercent">0%</small>
-          </div>
-          <div class="sparkline" aria-hidden="true"></div>
-          <p class="overview-update">Cập nhật lần cuối: <span id="overviewUpdatedAt">--</span></p>
+          <div class="trade-calendar-grid" id="tradeCalendarGrid"></div>
+          <div class="trade-calendar-details" id="tradeCalendarDetails"></div>
         </section>
 
         <section class="overview-card">
@@ -174,22 +174,6 @@
               <small id="profitCardPercent">0%</small>
             </div>
           </article>
-          <article class="summary-card cash account-money">
-            <span class="summary-icon">●</span>
-            <div>
-              <span>Tỷ lệ tiền mặt</span>
-              <strong id="cashRateValue">0%</strong>
-              <small id="cashValue">0 VND</small>
-            </div>
-          </article>
-          <article class="summary-card today account-money">
-            <span class="summary-icon">●</span>
-            <div>
-              <span>Lãi / Lỗ hôm nay</span>
-              <strong id="todayProfitValue">0</strong>
-              <small id="todayProfitPercent">0%</small>
-            </div>
-          </article>
         </section>
 
         <section class="table-wrap view-panel active" id="stocksView">
@@ -198,11 +182,6 @@
             <button class="metric-filter active" type="button" data-status-filter="hold">Đang nắm giữ (<span id="portfolioCount">0</span>)</button>
             <button class="metric-filter" type="button" data-status-filter="watching">Theo dõi (<span id="watchingCountInline">0</span>)</button>
             <button class="tab-btn" type="button" data-view="sales">Đã bán</button>
-            <div class="table-tools">
-              <button class="icon-btn" type="button">⌯ Bộ lọc</button>
-              <button class="icon-btn" type="button">▦</button>
-              <button class="icon-btn active" type="button">☰</button>
-            </div>
           </div>
           <table class="portfolio-table">
             <thead>
@@ -246,7 +225,7 @@
           </table>
           <div class="empty-state" id="salesEmptyState" hidden>
             <strong>Chưa có giao dịch bán</strong>
-            <span>Khi b�n một mục mua, giao dịch sẽ xuất hiện tại đ�y.</span>
+            <span>Khi bán một mục mua, giao dịch sẽ xuất hiện tại đây.</span>
           </div>
         </section>
 
@@ -389,8 +368,10 @@
         <td class="stock-profit-cell number-cell"></td>
         <td class="allocation-cell number-cell"></td>
         <td class="action-cell">
-          <button class="icon-btn action-add-btn add-lot-btn" type="button" title="Thêm giao dịch mua" aria-label="Thêm giao dịch mua">Thêm</button>
-          <button class="icon-btn action-delete-btn delete-btn" type="button" title="Xóa danh mục" aria-label="Xóa danh mục">Xóa</button>
+          <div class="action-button-row">
+            <button class="icon-btn action-add-btn add-lot-btn" type="button" title="Thêm giao dịch mua" aria-label="Thêm giao dịch mua">Thêm</button>
+            <button class="icon-btn action-delete-btn delete-btn" type="button" title="Xóa danh mục" aria-label="Xóa danh mục">Xóa</button>
+          </div>
         </td>
       </tr>
     </template>
@@ -412,6 +393,6 @@
       </tr>
     </template>
 
-    <script src="./script.js?v=20260706-3"></script>
+    <script src="./script.js?v=20260706-8"></script>
   </body>
 </html>
