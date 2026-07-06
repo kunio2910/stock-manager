@@ -1,6 +1,7 @@
 ﻿const STORAGE_KEY = "stock-desk-items";
 const SETTINGS_KEY = "stock-desk-settings";
 const ASSET_IMPORT_VERSION = 1;
+const SALES_IMPORT_VERSION = 1;
 const GOOGLE_SHEETS_API_URL =
   "https://script.google.com/macros/s/AKfycbxL-xGSo45yagueen_Lfct7BST6ITKOxTvQs5ymgx1t5w3L7UxDVZdRcc5L5bDqSGK7/exec";
 
@@ -25,10 +26,14 @@ let isApplyingCloudData = false;
 let settings = loadSettings();
 const expandedStocks = new Set();
 const lotSortState = {};
+let salesSortState = { key: "sellDate", direction: "desc" };
 
 const form = document.querySelector("#stockForm");
 const tableBody = document.querySelector("#stockTable");
 const salesTable = document.querySelector("#salesTable");
+const monthlySalesProfit = document.querySelector("#monthlySalesProfit");
+const salesProfitPie = document.querySelector("#salesProfitPie");
+const salesProfitLegend = document.querySelector("#salesProfitLegend");
 const template = document.querySelector("#rowTemplate");
 const lotTemplate = document.querySelector("#lotRowTemplate");
 const searchInput = document.querySelector("#searchInput");
@@ -439,6 +444,16 @@ salesTable.addEventListener("click", (event) => {
   saveData();
   render();
 });
+
+const salesHeader = salesTable.closest("table")?.querySelector("thead");
+if (salesHeader) {
+  salesHeader.addEventListener("click", (event) => {
+    const button = event.target.closest(".sort-sale-btn");
+    if (!button) return;
+    updateSalesSort(button.dataset.sortKey);
+    renderSales();
+  });
+}
 
 function saveLotFromForm(lotForm) {
   const stock = stocks.find((item) => item.id === lotForm.dataset.stockId);
@@ -1031,6 +1046,40 @@ function getLotSortValue(stock, lot, key) {
   return 0;
 }
 
+function updateSalesSort(key) {
+  salesSortState = {
+    key,
+    direction: salesSortState.key === key && salesSortState.direction === "asc" ? "desc" : "asc",
+  };
+}
+
+function getSalesSortMark(key) {
+  if (salesSortState.key !== key) return "";
+  return salesSortState.direction === "asc" ? " ▲" : " ▼";
+}
+
+function getSortedSales() {
+  return [...sales].sort((a, b) => {
+    const direction = salesSortState.direction === "asc" ? 1 : -1;
+    const aValue = getSaleSortValue(a, salesSortState.key);
+    const bValue = getSaleSortValue(b, salesSortState.key);
+    if (aValue < bValue) return -1 * direction;
+    if (aValue > bValue) return 1 * direction;
+    return 0;
+  });
+}
+
+function getSaleSortValue(sale, key) {
+  if (key === "symbol") return String(sale.symbol || "").toLowerCase();
+  if (key === "sellDate") return new Date(sale.sellDate || 0).getTime();
+  if (key === "quantity") return Number(sale.quantity || 0);
+  if (key === "buyPrice") return Number(sale.buyPrice || 0);
+  if (key === "sellPrice") return Number(sale.sellPrice || 0);
+  if (key === "profit") return Number(sale.profit || 0);
+  if (key === "profitPercent") return Number(sale.profitPercent || 0);
+  return 0;
+}
+
 function startInlineEdit(target, stock, field) {
   if (target.querySelector("input")) return;
 
@@ -1217,9 +1266,19 @@ function createSellForm(stock, lot) {
 
 function renderSales() {
   salesTable.innerHTML = "";
+  renderSalesSummary();
 
-  sales.forEach((sale) => {
+  salesTable
+    .closest("table")
+    ?.querySelectorAll(".sort-sale-btn")
+    .forEach((button) => {
+      button.textContent = `${button.dataset.label || button.textContent.replace(/[ ▲▼]+$/, "")}${getSalesSortMark(button.dataset.sortKey)}`;
+      button.dataset.label = button.textContent.replace(/[ ▲▼]+$/, "");
+    });
+
+  getSortedSales().forEach((sale) => {
     const row = document.createElement("tr");
+    row.style.setProperty("--stock-accent", getStockColor(sale.symbol || ""));
     row.innerHTML = `
       <td class="symbol-cell"></td>
       <td></td>
@@ -1252,6 +1311,86 @@ function renderSales() {
   });
 
   salesEmptyState.hidden = sales.length > 0;
+}
+
+function renderSalesSummary() {
+  renderMonthlySalesProfit();
+  renderSalesProfitPie();
+}
+
+function renderMonthlySalesProfit() {
+  if (!monthlySalesProfit) return;
+
+  const monthTotals = sales.reduce((groups, sale) => {
+    const date = createDateFromKey(sale.sellDate);
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    const current = groups.get(key) || { key, total: 0, quantity: 0 };
+    current.total += Number(sale.profit || 0);
+    current.quantity += Number(sale.quantity || 0);
+    groups.set(key, current);
+    return groups;
+  }, new Map());
+
+  const rows = [...monthTotals.values()].sort((a, b) => (a.key < b.key ? 1 : -1));
+  if (!rows.length) {
+    monthlySalesProfit.innerHTML = '<span class="summary-empty">Chưa có dữ liệu bán.</span>';
+    return;
+  }
+
+  monthlySalesProfit.innerHTML = rows
+    .map((row) => {
+      const [year, month] = row.key.split("-");
+      return `
+        <div class="monthly-profit-row">
+          <span>Tháng ${Number(month)}/${year}</span>
+          <strong class="${getProfitClass(row.total)}">${formatProfit(row.total)}</strong>
+          <small>${formatNumber(row.quantity)} CP</small>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function renderSalesProfitPie() {
+  if (!salesProfitPie || !salesProfitLegend) return;
+
+  const totals = sales.reduce((groups, sale) => {
+    const symbol = sale.symbol || "Khác";
+    groups.set(symbol, (groups.get(symbol) || 0) + Number(sale.profit || 0));
+    return groups;
+  }, new Map());
+  const items = [...totals.entries()]
+    .map(([symbol, profit]) => ({ symbol, profit }))
+    .filter((item) => item.profit > 0)
+    .sort((a, b) => b.profit - a.profit);
+  const totalProfit = items.reduce((total, item) => total + item.profit, 0);
+
+  if (!items.length || totalProfit <= 0) {
+    salesProfitPie.style.background = "#edf2ee";
+    salesProfitLegend.innerHTML = '<span class="summary-empty">Chưa có lợi nhuận bán.</span>';
+    return;
+  }
+
+  let cursor = 0;
+  const segments = items.map((item) => {
+    const start = cursor;
+    const end = start + (item.profit / totalProfit) * 100;
+    cursor = end;
+    return `${getStockColor(item.symbol)} ${start}% ${end}%`;
+  });
+  salesProfitPie.style.background = `conic-gradient(${segments.join(", ")})`;
+  salesProfitLegend.innerHTML = items
+    .map((item) => {
+      const percent = (item.profit / totalProfit) * 100;
+      return `
+        <div class="sales-profit-legend-row">
+          <span class="legend-dot" style="background:${getStockColor(item.symbol)}"></span>
+          <strong>${item.symbol}</strong>
+          <span>${formatProfit(item.profit)} (${percent.toFixed(1)}%)</span>
+        </div>
+      `;
+    })
+    .join("");
 }
 
 function renderTradeCalendar() {
@@ -1797,12 +1936,13 @@ function loadData() {
     try {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed)) {
-        return { stocks: parsed.map(normalizeStock), sales: [], assets: mergeImportedAssets([]) };
+        return { stocks: parsed.map(normalizeStock), sales: mergeImportedSales([]), assets: mergeImportedAssets([]) };
       }
       const normalizedAssets = Array.isArray(parsed.assets) ? parsed.assets.map(normalizeAsset) : [];
+      const normalizedSales = Array.isArray(parsed.sales) ? parsed.sales.map(normalizeSale) : [];
       return {
         stocks: Array.isArray(parsed.stocks) ? parsed.stocks.map(normalizeStock) : [],
-        sales: Array.isArray(parsed.sales) ? parsed.sales.map(normalizeSale) : [],
+        sales: parsed.salesImportVersion === SALES_IMPORT_VERSION ? normalizedSales : mergeImportedSales(normalizedSales),
         assets: parsed.assetImportVersion === ASSET_IMPORT_VERSION ? normalizedAssets : mergeImportedAssets(normalizedAssets),
       };
     } catch {
@@ -1810,7 +1950,7 @@ function loadData() {
     }
   }
 
-  return { stocks: getSampleStocks(), sales: [], assets: mergeImportedAssets([]) };
+  return { stocks: getSampleStocks(), sales: mergeImportedSales([]), assets: mergeImportedAssets([]) };
 }
 
 function getSampleStocks() {
@@ -1900,6 +2040,50 @@ function normalizeSale(sale) {
     profit: Number(sale.profit || 0),
     profitPercent: sale.profitPercent === null ? null : Number(sale.profitPercent || 0),
   };
+}
+
+function mergeImportedSales(existingSales) {
+  const existingIds = new Set(existingSales.map((sale) => sale.id));
+  const importedSales = getImportedSales().filter((sale) => !existingIds.has(sale.id));
+  return [...importedSales, ...existingSales].map(normalizeSale);
+}
+
+function getImportedSales() {
+  const rows = [
+    ["2026-04-08", "SSI", 26950, 28700, 200, 350000, 6.49],
+    ["2026-04-08", "SSI", 27250, 28700, 300, 435000, 5.32],
+    ["2026-04-08", "SSI", 27850, 29250, 200, 240000, 4.31],
+    ["2026-04-08", "SSI", 27850, 29250, 100, 140000, 5.03],
+    ["2026-04-08", "HAH", 53900, 56200, 100, 230000, 4.27],
+    ["2026-04-22", "HAH", 53600, 55300, 100, 170000, 3.17],
+    ["2026-04-23", "HAH", 54200, 56600, 100, 240000, 4.43],
+    ["2026-04-23", "HAH", 54400, 56700, 100, 230000, 4.23],
+    ["2026-04-23", "HAH", 55100, 57200, 100, 171000, 3.81],
+    ["2026-05-06", "SSI", 27450, 28650, 200, 201000, 3.67],
+    ["2026-05-07", "HAH", 55600, 57300, 100, 131000, 2.36],
+    ["2026-05-07", "HAH", 56100, 57900, 100, 141000, 2.51],
+    ["2026-05-08", "SSI", 27850, 28300, 100, 26000, 0.93],
+    ["2026-05-13", "HAH", 56300, 58100, 100, 141000, 2.5],
+    ["2026-06-04", "HAH", 52500, 55400, 100, 255000, 4.85],
+    ["2026-06-17", "SSI", 26900, 27650, 200, 115000, 2.13],
+    ["2026-06-17", "HAH", 53800, 56000, 100, 185000, 3.43],
+    ["2026-06-17", "HAH", 54100, 56000, 100, 155000, 2.85],
+  ];
+
+  return rows.map(([sellDate, symbol, buyPrice, sellPrice, quantity, profit, profitPercent], index) => ({
+    id: `imported-sale-${index + 1}`,
+    stockId: "",
+    symbol,
+    name: symbol,
+    buyDate: "",
+    sellDate,
+    quantity,
+    buyPrice,
+    sellPrice,
+    profit,
+    profitPercent,
+    createdAt: `${sellDate}T00:00:00.000Z`,
+  }));
 }
 
 function normalizeAsset(asset) {
@@ -2000,7 +2184,7 @@ function saveData() {
 }
 
 function getAppData() {
-  return { stocks, sales, assets, assetImportVersion: ASSET_IMPORT_VERSION };
+  return { stocks, sales, assets, assetImportVersion: ASSET_IMPORT_VERSION, salesImportVersion: SALES_IMPORT_VERSION };
 }
 
 function scheduleCloudSave() {
@@ -2025,7 +2209,8 @@ async function loadDataFromCloud() {
 
     isApplyingCloudData = true;
     stocks = Array.isArray(cloudData.stocks) ? cloudData.stocks.map(normalizeStock) : [];
-    sales = Array.isArray(cloudData.sales) ? cloudData.sales.map(normalizeSale) : [];
+    const cloudSales = Array.isArray(cloudData.sales) ? cloudData.sales.map(normalizeSale) : [];
+    sales = cloudData.salesImportVersion === SALES_IMPORT_VERSION ? cloudSales : mergeImportedSales(cloudSales);
     assets = Array.isArray(cloudData.assets) ? cloudData.assets.map(normalizeAsset) : [];
     localStorage.setItem(STORAGE_KEY, JSON.stringify(getAppData()));
     isApplyingCloudData = false;

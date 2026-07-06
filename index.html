@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stock Desk</title>
-    <link rel="stylesheet" href="./styles.css?v=20260706-14" />
+    <link rel="stylesheet" href="./styles.css?v=20260706-16" />
   </head>
   <body>
     <main class="app-shell">
@@ -189,25 +189,40 @@
           </div>
           </section>
 
-          <section class="table-wrap view-panel" id="salesView">
-          <table>
-            <thead>
-              <tr>
-                <th>Mã</th>
-                <th>Ngày bán</th>
-                <th>Số lượng bán</th>
-                <th>Giá mua</th>
-                <th>Giá bán</th>
-                <th>Lợi nhuận</th>
-                <th>% lợi nhuận</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="salesTable"></tbody>
-          </table>
-          <div class="empty-state" id="salesEmptyState" hidden>
-            <strong>Chưa có giao dịch bán</strong>
-            <span>Khi bán một mục mua, giao dịch sẽ xuất hiện tại đây.</span>
+          <section class="table-wrap sales-panel view-panel" id="salesView">
+          <div class="sales-summary-grid">
+            <article class="sales-summary-card">
+              <h3>Lợi nhuận bán theo tháng</h3>
+              <div class="monthly-profit-list" id="monthlySalesProfit"></div>
+            </article>
+            <article class="sales-summary-card">
+              <h3>Lợi nhuận theo mã</h3>
+              <div class="sales-profit-chart">
+                <div class="sales-pie-chart" id="salesProfitPie" aria-hidden="true"></div>
+                <div class="sales-profit-legend" id="salesProfitLegend"></div>
+              </div>
+            </article>
+          </div>
+          <div class="sales-table-scroll">
+            <table class="sales-table">
+              <thead>
+                <tr>
+                  <th><button class="sort-btn sort-sale-btn" type="button" data-sort-key="symbol">Mã</button></th>
+                  <th><button class="sort-btn sort-sale-btn" type="button" data-sort-key="sellDate">Ngày bán</button></th>
+                  <th><button class="sort-btn sort-sale-btn" type="button" data-sort-key="quantity">Số lượng bán</button></th>
+                  <th><button class="sort-btn sort-sale-btn" type="button" data-sort-key="buyPrice">Giá mua</button></th>
+                  <th><button class="sort-btn sort-sale-btn" type="button" data-sort-key="sellPrice">Giá bán</button></th>
+                  <th><button class="sort-btn sort-sale-btn" type="button" data-sort-key="profit">Lợi nhuận</button></th>
+                  <th><button class="sort-btn sort-sale-btn" type="button" data-sort-key="profitPercent">% lợi nhuận</button></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="salesTable"></tbody>
+            </table>
+            <div class="empty-state" id="salesEmptyState" hidden>
+              <strong>Chưa có giao dịch bán</strong>
+              <span>Khi bán một mục mua, giao dịch sẽ xuất hiện tại đây.</span>
+            </div>
           </div>
           </section>
 
@@ -379,6 +394,6 @@
       </tr>
     </template>
 
-    <script src="./script.js?v=20260706-14"></script>
+    <script src="./script.js?v=20260706-16"></script>
   </body>
 </html>
