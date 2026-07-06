@@ -39,7 +39,7 @@ button {
 
 .app-shell {
   display: grid;
-  grid-template-columns: clamp(76px, 12vw, 180px) clamp(260px, 22vw, 314px) minmax(0, 1fr);
+  grid-template-columns: clamp(260px, 22vw, 314px) minmax(0, 1fr);
   min-height: 100vh;
   overflow: hidden;
 }
@@ -72,42 +72,6 @@ button {
   color: var(--accent);
   background: #fff;
   font-weight: 900;
-}
-
-.sidebar-collapsed .app-shell {
-  grid-template-columns: 76px clamp(260px, 22vw, 314px) minmax(0, 1fr);
-}
-
-.sidebar-collapsed .table-wrap {
-  max-width: calc(100vw - 76px - clamp(260px, 22vw, 314px) - 36px);
-}
-
-.sidebar-collapsed .brand-block {
-  justify-content: center;
-  padding: 0;
-}
-
-.sidebar-collapsed .brand-mark,
-.sidebar-collapsed .brand-block strong,
-.sidebar-collapsed .investor-card div,
-.sidebar-collapsed .investor-card > span:last-child {
-  display: none;
-}
-
-.sidebar-collapsed .side-menu button {
-  justify-content: center;
-  padding: 10px;
-  font-size: 0;
-}
-
-.sidebar-collapsed .side-menu button span {
-  font-size: 16px;
-}
-
-.sidebar-collapsed .investor-card {
-  grid-template-columns: 1fr;
-  justify-items: center;
-  padding: 10px;
 }
 
 .brand-mark {
@@ -402,6 +366,7 @@ button {
   gap: 10px;
   color: var(--muted);
   font-size: 13px;
+  min-width: 0;
 }
 
 .trade-detail-head strong {
@@ -418,7 +383,7 @@ button {
 
 .trade-calendar-details li {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) 0.9fr 0.8fr 0.9fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -428,6 +393,7 @@ button {
 
 .trade-calendar-details li div {
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .trade-calendar-details li span {
@@ -440,6 +406,8 @@ button {
   display: block;
   margin-top: 2px;
   font-size: 13px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .holding-chart {
@@ -564,6 +532,38 @@ button {
   gap: 8px;
 }
 
+.title-chart-icon {
+  position: relative;
+  display: block;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f7fffb;
+}
+
+.title-chart-icon::before,
+.title-chart-icon::after {
+  content: "";
+  position: absolute;
+  bottom: 6px;
+  width: 5px;
+  border-radius: 4px 4px 0 0;
+}
+
+.title-chart-icon::before {
+  left: 7px;
+  height: 8px;
+  background: #35b86f;
+  box-shadow: 7px -5px 0 #2f6df6;
+}
+
+.title-chart-icon::after {
+  right: 6px;
+  height: 15px;
+  background: var(--accent);
+}
+
 .page-title h1 {
   margin: 0;
   color: var(--muted);
@@ -630,6 +630,36 @@ button {
 
 #filterInput {
   max-width: 130px;
+}
+
+.visually-hidden-control {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.toolbar-settings-btn {
+  min-height: 42px;
+  border-color: var(--line);
+  padding: 9px 14px;
+  color: var(--ink);
+  background: #fff;
+  box-shadow: none;
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.toolbar-settings-btn.active {
+  color: #fff;
+  border-color: var(--accent);
+  background: var(--accent);
 }
 
 .notify-btn {
@@ -734,7 +764,25 @@ button {
   border-radius: 8px;
   background: #fff;
   overflow: auto;
-  max-width: calc(100vw - clamp(76px, 12vw, 180px) - clamp(260px, 22vw, 314px) - 36px);
+  max-width: calc(100vw - clamp(260px, 22vw, 314px) - 36px);
+}
+
+.portfolio-workspace {
+  margin: 0 18px 24px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+  max-width: calc(100vw - clamp(260px, 22vw, 314px) - 36px);
+}
+
+.portfolio-workspace > .table-wrap,
+.portfolio-workspace > .manage-panel,
+.portfolio-workspace > .asset-panel {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  max-width: none;
 }
 
 .portfolio-tabs {
@@ -1392,11 +1440,12 @@ textarea {
 
 @media (max-width: 1180px) {
   .app-shell {
-    grid-template-columns: 78px minmax(240px, 280px) minmax(0, 1fr);
+    grid-template-columns: minmax(240px, 280px) minmax(0, 1fr);
   }
 
-  .table-wrap {
-    max-width: calc(100vw - 78px - 240px - 36px);
+  .table-wrap,
+  .portfolio-workspace {
+    max-width: calc(100vw - 240px - 36px);
   }
 
   .portfolio-table {
@@ -1407,29 +1456,6 @@ textarea {
   th,
   td {
     padding: 10px 10px;
-  }
-
-  .app-nav {
-    padding-inline: 8px;
-  }
-
-  .brand-block strong,
-  .side-menu button:not(.active) {
-    font-size: 0;
-  }
-
-  .side-menu button span {
-    font-size: 16px;
-  }
-
-  .investor-card {
-    grid-template-columns: 1fr;
-    justify-items: center;
-  }
-
-  .investor-card div,
-  .investor-card > span:last-child {
-    display: none;
   }
 
   .dashboard-summary {
@@ -1445,56 +1471,6 @@ textarea {
   .app-shell {
     display: block;
     overflow: visible;
-  }
-
-  .app-nav {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    display: block;
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--line);
-    background: #fff;
-  }
-
-  .brand-block {
-    justify-content: space-between;
-    padding: 0;
-  }
-
-  .sidebar-collapsed .brand-block strong {
-    display: inline;
-  }
-
-  .sidebar-collapsed .brand-block {
-    justify-content: space-between;
-  }
-
-  .brand-mark,
-  .investor-card {
-    display: none;
-  }
-
-  .side-menu {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    scrollbar-width: thin;
-  }
-
-  .side-menu button,
-  .sidebar-collapsed .side-menu button {
-    flex: 0 0 auto;
-    min-height: 36px;
-    padding: 8px 10px;
-    font-size: 13px;
-    white-space: nowrap;
-  }
-
-  .sidebar-collapsed .side-menu button span {
-    font-size: 14px;
   }
 
   .content-panel,
@@ -1527,7 +1503,8 @@ textarea {
   .secondary-btn,
   .primary-btn,
   .search-box,
-  #filterInput {
+  #filterInput,
+  .toolbar-settings-btn {
     width: 100%;
   }
 
@@ -1536,11 +1513,18 @@ textarea {
     padding: 14px 12px;
   }
 
-  .table-wrap {
+  .table-wrap,
+  .portfolio-workspace {
     max-width: calc(100vw - 24px);
     margin: 0 12px 18px;
     overflow: visible;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .portfolio-workspace > .table-wrap,
+  .portfolio-workspace > .manage-panel,
+  .portfolio-workspace > .asset-panel {
+    margin: 0;
   }
 
   .portfolio-table {

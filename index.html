@@ -5,34 +5,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stock Desk</title>
-    <link rel="stylesheet" href="./styles.css?v=20260706-8" />
+    <link rel="stylesheet" href="./styles.css?v=20260706-11" />
   </head>
-  <body class="sidebar-collapsed">
+  <body>
     <main class="app-shell">
-      <aside class="app-nav" aria-label="Điều hướng">
-        <div class="brand-block">
-          <button class="sidebar-toggle" type="button" id="sidebarToggleButton" aria-label="Đóng mở menu">☰</button>
-          <span class="brand-mark" aria-hidden="true"></span>
-          <strong>STOCK DESK</strong>
-        </div>
-        <nav class="side-menu">
-          <button class="nav-btn active" type="button" data-nav-view="stocks" data-nav-filter="all"><span>◆</span>Tổng quan</button>
-          <button class="nav-btn" type="button" data-nav-view="stocks" data-nav-filter="hold"><span>□</span>Đang nắm giữ</button>
-          <button class="nav-btn" type="button" data-nav-view="stocks" data-nav-filter="watching"><span>♡</span>Theo dõi</button>
-          <button class="tab-btn" type="button" data-view="sales"><span>▥</span>Báo cáo</button>
-          <button class="tab-btn" type="button" data-view="assets"><span>▤</span>Quản lý</button>
-          <button class="tab-btn" type="button" data-view="settings"><span>⚙</span>Cài đặt</button>
-        </nav>
-        <div class="investor-card">
-          <span class="avatar" aria-hidden="true"></span>
-          <div>
-            <strong>Nhà đầu tư</strong>
-            <small>Tài khoản chính</small>
-          </div>
-          <span>⌄</span>
-        </div>
-      </aside>
-
       <aside class="overview-panel" aria-label="Tổng quan danh mục">
         <section class="overview-card trade-calendar-card">
           <h2>LỊCH GIAO DỊCH</h2>
@@ -54,9 +30,11 @@
           <div class="trade-calendar-details" id="tradeCalendarDetails"></div>
         </section>
 
-        <section class="overview-card">
-          <h2>PHÂN TÍCH DANH MỤC</h2>
-          <div class="holding-chart" aria-label="Biểu đồ tỷ trọng nắm giữ">
+        <section class="overview-card analysis-card collapsible-card">
+          <button class="collapsible-toggle" type="button" aria-expanded="false">
+            <span>PHÂN TÍCH DANH MỤC</span>
+          </button>
+          <div class="holding-chart collapsible-content" aria-label="Biểu đồ tỷ trọng nắm giữ">
             <div class="chart-mode-toggle" aria-label="Chọn kiểu biểu đồ tỷ trọng">
               <button class="chart-mode-btn active" type="button" data-holding-mode="quantity">Số lượng</button>
               <button class="chart-mode-btn" type="button" data-holding-mode="cost">Vốn</button>
@@ -131,6 +109,7 @@
       <section class="content-panel">
         <header class="toolbar">
           <div class="page-title">
+            <span class="title-chart-icon" aria-hidden="true"></span>
             <h1>Danh mục của tôi</h1>
           </div>
           <div class="toolbar-actions">
@@ -140,12 +119,13 @@
               <span>⌕</span>
               <input id="searchInput" type="search" placeholder="Tìm mã, tên công ty..." />
             </label>
-            <select id="filterInput" aria-label="Lọc theo trạng thái">
+            <select id="filterInput" class="visually-hidden-control" aria-label="Lọc theo trạng thái">
               <option value="all">Tất cả</option>
               <option value="watching">Đang theo dõi</option>
               <option value="hold">Đang nắm giữ</option>
               <option value="alert">Cần chú ý</option>
             </select>
+            <button class="icon-btn toolbar-settings-btn tab-btn" type="button" data-view="settings">⚙ Cài đặt</button>
           </div>
         </header>
 
@@ -176,13 +156,15 @@
           </article>
         </section>
 
-        <section class="table-wrap view-panel active" id="stocksView">
+        <section class="portfolio-workspace">
           <div class="portfolio-tabs">
             <button class="metric-filter" type="button" data-status-filter="all">Tất cả</button>
             <button class="metric-filter active" type="button" data-status-filter="hold">Đang nắm giữ (<span id="portfolioCount">0</span>)</button>
             <button class="metric-filter" type="button" data-status-filter="watching">Theo dõi (<span id="watchingCountInline">0</span>)</button>
             <button class="tab-btn" type="button" data-view="sales">Đã bán</button>
+            <button class="tab-btn" type="button" data-view="assets">Quản lý</button>
           </div>
+          <section class="table-wrap view-panel active" id="stocksView">
           <table class="portfolio-table">
             <thead>
               <tr>
@@ -205,9 +187,9 @@
             <strong>Chưa có mã phù hợp</strong>
             <span>Thêm mã mới hoặc thay đổi bộ lọc để xem danh sách.</span>
           </div>
-        </section>
+          </section>
 
-        <section class="table-wrap view-panel" id="salesView">
+          <section class="table-wrap view-panel" id="salesView">
           <table>
             <thead>
               <tr>
@@ -227,7 +209,7 @@
             <strong>Chưa có giao dịch bán</strong>
             <span>Khi bán một mục mua, giao dịch sẽ xuất hiện tại đây.</span>
           </div>
-        </section>
+          </section>
 
         <section class="manage-panel view-panel" id="manageView">
           <form class="stock-form" id="stockForm">
@@ -277,7 +259,7 @@
           </form>
         </section>
 
-        <section class="asset-panel view-panel" id="assetsView">
+          <section class="asset-panel view-panel" id="assetsView">
           <form class="asset-form" id="assetForm">
             <label>
               Ngày
@@ -335,6 +317,7 @@
               <span>Nhập tổng tài sản và thời gian để theo dõi lịch sử.</span>
             </div>
           </div>
+          </section>
         </section>
 
         <section class="settings-panel view-panel" id="settingsView">
@@ -393,6 +376,6 @@
       </tr>
     </template>
 
-    <script src="./script.js?v=20260706-8"></script>
+    <script src="./script.js?v=20260706-11"></script>
   </body>
 </html>

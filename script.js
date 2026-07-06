@@ -128,9 +128,11 @@ searchInput.addEventListener("input", render);
 filterInput.addEventListener("change", render);
 refreshPricesButton.addEventListener("click", updatePricesFromFireAnt);
 
-sidebarToggleButton.addEventListener("click", () => {
-  document.body.classList.toggle("sidebar-collapsed");
-});
+if (sidebarToggleButton) {
+  sidebarToggleButton.addEventListener("click", () => {
+    document.body.classList.toggle("sidebar-collapsed");
+  });
+}
 
 navButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -679,7 +681,6 @@ function createLotsRow(stock, stockColor) {
   summaryGroup.append(cost, value, profit);
   header.append(title, summaryGroup);
 
-  const chart = createFireAntChart(stock);
   const shouldShowLotForm = addingLotStockId === stock.id || editingLot?.stockId === stock.id;
   const form = shouldShowLotForm ? createLotForm(stock) : null;
   const lotsList = document.createElement("table");
@@ -722,7 +723,6 @@ function createLotsRow(stock, stockColor) {
   lotsList.append(lotsBody);
 
   panel.append(header);
-  panel.append(chart);
   if (form) panel.append(form);
   const addButton = document.createElement("button");
   addButton.className = "add-inline-btn add-lot-btn";
@@ -1282,7 +1282,6 @@ function renderTradeCalendarDetails(dayTrades) {
         <li>
           <div>
             <strong>${trade.symbol}</strong>
-            <span>${trade.name}</span>
           </div>
           <div>
             <span>Giá mua</span>
