@@ -3,274 +3,413 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quan ly ma co phieu</title>
+    <title>Stock Desk</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body class="sidebar-collapsed">
     <main class="app-shell">
-      <section class="workspace">
-        <aside class="sidebar" aria-label="Tong quan danh muc">
-          <div class="brand-block">
-            <p class="eyebrow">Stock Desk</p>
-            <h1>Quan ly ma co phieu</h1>
+      <aside class="app-nav" aria-label="Điều hướng">
+        <div class="brand-block">
+          <button class="sidebar-toggle" type="button" id="sidebarToggleButton" aria-label="Đóng mở menu">☰</button>
+          <span class="brand-mark" aria-hidden="true"></span>
+          <strong>STOCK DESK</strong>
+        </div>
+        <nav class="side-menu">
+          <button class="nav-btn active" type="button" data-nav-view="stocks" data-nav-filter="all"><span>◆</span>Tổng quan</button>
+          <button class="nav-btn" type="button" data-nav-view="stocks" data-nav-filter="hold"><span>□</span>Đang nắm giữ</button>
+          <button class="nav-btn" type="button" data-nav-view="stocks" data-nav-filter="watching"><span>♡</span>Theo dõi</button>
+          <button class="tab-btn" type="button" data-view="sales"><span>▥</span>Báo cáo</button>
+          <button class="tab-btn" type="button" data-view="assets"><span>▤</span>Quản lý</button>
+          <button class="tab-btn" type="button" data-view="settings"><span>⚙</span>Cài đặt</button>
+        </nav>
+        <div class="investor-card">
+          <span class="avatar" aria-hidden="true"></span>
+          <div>
+            <strong>Nhà đầu tư</strong>
+            <small>Tài khoản chính</small>
           </div>
+          <span>⌄</span>
+        </div>
+      </aside>
 
-          <div class="metric-grid" aria-label="Thong ke nhanh">
-            <button class="metric metric-filter" type="button" data-status-filter="all">
-              <span>Tong ma</span>
+      <aside class="overview-panel" aria-label="Tổng quan danh mục">
+        <section class="overview-card">
+          <h2>TỔNG QUAN DANH MỤC</h2>
+          <div class="overview-metric account-money">
+            <span>Tổng vốn</span>
+            <strong id="totalCapitalValue">0</strong>
+            <small>VND</small>
+          </div>
+          <div class="overview-metric account-money">
+            <span>Giá trị hiện tại</span>
+            <strong id="currentPortfolioValue">0</strong>
+            <small>VND</small>
+          </div>
+          <div class="overview-metric danger account-money">
+            <span>Lãi / Lỗ</span>
+            <strong id="totalProfitValue">0</strong>
+            <small id="totalProfitPercent">0%</small>
+          </div>
+          <div class="sparkline" aria-hidden="true"></div>
+          <p class="overview-update">Cập nhật lần cuối: <span id="overviewUpdatedAt">--</span></p>
+        </section>
+
+        <section class="overview-card">
+          <h2>PHÂN TÍCH DANH MỤC</h2>
+          <div class="holding-chart" aria-label="Biểu đồ tỷ trọng nắm giữ">
+            <div class="chart-mode-toggle" aria-label="Chọn kiểu biểu đồ tỷ trọng">
+              <button class="chart-mode-btn active" type="button" data-holding-mode="quantity">Số lượng</button>
+              <button class="chart-mode-btn" type="button" data-holding-mode="cost">Vốn</button>
+            </div>
+            <div class="chart-body">
+              <div class="pie-chart" id="holdingPie" aria-hidden="true"></div>
+              <div>
+                <span id="holdingChartModeText">Theo % số lượng</span>
+                <div class="chart-legend" id="holdingLegend"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="overview-card stat-list collapsible-card">
+          <button class="collapsible-toggle" type="button" aria-expanded="false">
+            <span>THỐNG KÊ</span>
+          </button>
+          <div class="collapsible-content">
+            <button class="metric-filter" type="button" data-status-filter="all">
+              <span>Tổng số mã</span>
               <strong id="totalStocks">0</strong>
             </button>
-            <button class="metric metric-filter" type="button" data-status-filter="watching">
-              <span>Dang theo doi</span>
+            <button class="metric-filter" type="button" data-status-filter="watching">
+              <span>Đang theo dõi</span>
               <strong id="watchingStocks">0</strong>
             </button>
-            <button class="metric metric-filter" type="button" data-status-filter="hold">
-              <span>Dang nam giu</span>
+            <button class="metric-filter" type="button" data-status-filter="hold">
+              <span>Đang nắm giữ</span>
               <strong id="holdingStocks">0</strong>
             </button>
-            <button class="metric metric-filter" type="button" data-status-filter="alert">
-              <span>Can chu y</span>
+            <button class="metric-filter" type="button" data-status-filter="alert">
+              <span>Cần chú ý</span>
               <strong id="alertStocks">0</strong>
             </button>
           </div>
+        </section>
 
-          <section class="holding-chart" aria-label="Bieu do ty trong nam giu">
-            <div class="chart-head">
-              <strong>Ty trong dang nam giu</strong>
-              <span id="holdingChartModeText">Theo % so luong</span>
-            </div>
-            <div class="chart-mode-toggle" aria-label="Chon kieu bieu do ty trong">
-              <button class="chart-mode-btn active" type="button" data-holding-mode="quantity">So luong</button>
-              <button class="chart-mode-btn" type="button" data-holding-mode="cost">Tong tien mua</button>
-            </div>
-            <div class="pie-chart" id="holdingPie" aria-hidden="true"></div>
-            <div class="chart-legend" id="holdingLegend"></div>
-          </section>
-
-        </aside>
-
-        <section class="content-panel">
-          <header class="toolbar">
-            <div>
-              <p class="eyebrow">Bang theo doi</p>
-              <h2>Danh sach co phieu</h2>
-            </div>
-            <div class="toolbar-actions">
-              <button class="secondary-btn refresh-price-btn" type="button" id="refreshPricesButton">Cap nhat gia</button>
-              <span class="price-update-status" id="priceUpdateStatus">Nhap gia thu cong neu khong co internet</span>
-              <label class="search-box">
-                <span>Tim kiem</span>
-                <input id="searchInput" type="search" placeholder="Ma, ten cong ty, nganh..." />
-              </label>
-              <select id="filterInput" aria-label="Loc theo trang thai">
-                <option value="all">Tat ca trang thai</option>
-                <option value="watching">Dang theo doi</option>
-                <option value="hold">Dang nam giu</option>
-                <option value="alert">Can chu y</option>
+        <section class="overview-card quick-add-card collapsible-card">
+          <button class="collapsible-toggle" type="button" aria-expanded="false">
+            <span>THÊM DANH MỤC</span>
+          </button>
+          <form class="quick-stock-form collapsible-content" id="quickStockForm">
+            <label>
+              Mã cổ phiếu
+              <input id="quickSymbolInput" autocomplete="off" maxlength="12" placeholder="VD: SSI" required />
+            </label>
+            <label>
+              Giá hiện tại
+              <input id="quickPriceInput" type="number" min="0" step="0.01" placeholder="VD: 27500" required />
+            </label>
+            <label>
+              Tên công ty
+              <input id="quickNameInput" autocomplete="off" placeholder="Tên công ty" required />
+            </label>
+            <label>
+              Chú thích
+              <textarea id="quickNoteInput" rows="2" placeholder="Ghi chú ngắn..."></textarea>
+            </label>
+            <label>
+              Phân loại
+              <select id="quickStatusInput">
+                <option value="hold">Đang nắm giữ</option>
+                <option value="watching">Theo dõi</option>
               </select>
+            </label>
+            <button class="primary-btn" type="submit">Thêm danh mục</button>
+          </form>
+        </section>
+      </aside>
+
+      <section class="content-panel">
+        <header class="toolbar">
+          <div class="page-title">
+            <h1>Danh mục của tôi</h1>
+          </div>
+          <div class="toolbar-actions">
+            <button class="secondary-btn refresh-price-btn" type="button" id="refreshPricesButton">⟳ Cập nhật giá</button>
+            <span class="price-update-status" id="priceUpdateStatus">Cập nhật lần cuối<br /><strong>--</strong></span>
+            <label class="search-box">
+              <span>⌕</span>
+              <input id="searchInput" type="search" placeholder="Tìm mã, tên công ty..." />
+            </label>
+            <select id="filterInput" aria-label="Lọc theo trạng thái">
+              <option value="all">Tất cả</option>
+              <option value="watching">Đang theo dõi</option>
+              <option value="hold">Đang nắm giữ</option>
+              <option value="alert">Cần chú ý</option>
+            </select>
+          </div>
+        </header>
+
+        <section class="dashboard-summary" aria-label="Chỉ số danh mục">
+          <article class="summary-card capital account-money">
+            <span class="summary-icon">●</span>
+            <div>
+              <span>Tổng vốn</span>
+              <strong id="capitalCardValue">0</strong>
+              <small>VND</small>
             </div>
-          </header>
+          </article>
+          <article class="summary-card value account-money">
+            <span class="summary-icon">●</span>
+            <div>
+              <span>Giá trị hiện tại</span>
+              <strong id="valueCardValue">0</strong>
+              <small>VND</small>
+            </div>
+          </article>
+          <article class="summary-card profit account-money">
+            <span class="summary-icon">●</span>
+            <div>
+              <span>Lãi / Lỗ</span>
+              <strong id="profitCardValue">0</strong>
+              <small id="profitCardPercent">0%</small>
+            </div>
+          </article>
+          <article class="summary-card cash account-money">
+            <span class="summary-icon">●</span>
+            <div>
+              <span>Tỷ lệ tiền mặt</span>
+              <strong id="cashRateValue">0%</strong>
+              <small id="cashValue">0 VND</small>
+            </div>
+          </article>
+          <article class="summary-card today account-money">
+            <span class="summary-icon">●</span>
+            <div>
+              <span>Lãi / Lỗ hôm nay</span>
+              <strong id="todayProfitValue">0</strong>
+              <small id="todayProfitPercent">0%</small>
+            </div>
+          </article>
+        </section>
 
-          <nav class="view-tabs" aria-label="Chuyen man hinh">
-            <button class="tab-btn active" type="button" data-view="stocks">Danh sach co phieu</button>
-            <button class="tab-btn" type="button" data-view="sales">Bao cao ban</button>
-            <button class="tab-btn" type="button" data-view="manage">Quan ly ma</button>
-            <button class="tab-btn" type="button" data-view="assets">Tong tai san</button>
-          </nav>
+        <section class="table-wrap view-panel active" id="stocksView">
+          <div class="portfolio-tabs">
+            <button class="metric-filter" type="button" data-status-filter="all">Tất cả</button>
+            <button class="metric-filter active" type="button" data-status-filter="hold">Đang nắm giữ (<span id="portfolioCount">0</span>)</button>
+            <button class="metric-filter" type="button" data-status-filter="watching">Theo dõi (<span id="watchingCountInline">0</span>)</button>
+            <button class="tab-btn" type="button" data-view="sales">Đã bán</button>
+            <div class="table-tools">
+              <button class="icon-btn" type="button">⌯ Bộ lọc</button>
+              <button class="icon-btn" type="button">▦</button>
+              <button class="icon-btn active" type="button">☰</button>
+            </div>
+          </div>
+          <table class="portfolio-table">
+            <thead>
+              <tr>
+                <th>Mã</th>
+                <th>Công ty</th>
+                <th>Sàn</th>
+                <th>Số lượng</th>
+                <th>Giá vốn TB</th>
+                <th>Giá hiện tại</th>
+                <th>Giá trị vốn</th>
+                <th>Giá trị hiện tại</th>
+                <th>Lãi / Lỗ</th>
+                <th>Tỷ lệ</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="stockTable"></tbody>
+          </table>
+          <div class="empty-state" id="emptyState" hidden>
+            <strong>Chưa có mã phù hợp</strong>
+            <span>Thêm mã mới hoặc thay đổi bộ lọc để xem danh sách.</span>
+          </div>
+        </section>
 
-          <div class="table-wrap view-panel active" id="stocksView">
+        <section class="table-wrap view-panel" id="salesView">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã</th>
+                <th>Ngày bán</th>
+                <th>Số lượng bán</th>
+                <th>Giá mua</th>
+                <th>Giá bán</th>
+                <th>Lợi nhuận</th>
+                <th>% lợi nhuận</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="salesTable"></tbody>
+          </table>
+          <div class="empty-state" id="salesEmptyState" hidden>
+            <strong>Chưa có giao dịch bán</strong>
+            <span>Khi bán một mục mua, giao dịch sẽ xuất hiện tại đây.</span>
+          </div>
+        </section>
+
+        <section class="manage-panel view-panel" id="manageView">
+          <form class="stock-form" id="stockForm">
+            <label>
+              Mã cổ phiếu
+              <input id="symbolInput" name="symbol" autocomplete="off" maxlength="12" placeholder="VD: FPT" required />
+            </label>
+            <label>
+              Tên công ty
+              <input id="nameInput" name="name" autocomplete="off" placeholder="FPT Corporation" required />
+            </label>
+            <div class="form-row">
+              <label>
+                Sàn
+                <select id="exchangeInput" name="exchange">
+                  <option>HOSE</option>
+                  <option>HNX</option>
+                  <option>UPCOM</option>
+                  <option>NYSE</option>
+                  <option>NASDAQ</option>
+                </select>
+              </label>
+              <label>
+                Ngành
+                <input id="sectorInput" name="sector" autocomplete="off" placeholder="Công nghệ" />
+              </label>
+            </div>
+            <div class="form-row">
+              <label>
+                Giá hiện tại
+                <input id="priceInput" name="price" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0" />
+              </label>
+              <label>
+                Trạng thái
+                <select id="statusInput" name="status">
+                  <option value="watching">Đang theo dõi</option>
+                  <option value="hold">Đang nắm giữ</option>
+                  <option value="alert">Cần chú ý</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              Ghi chú
+              <textarea id="noteInput" name="note" rows="3" placeholder="Lý do theo dõi, vùng mua, tin tức cần kiểm tra..."></textarea>
+            </label>
+            <button class="primary-btn" type="submit" id="submitButton">Thêm mã</button>
+          </form>
+        </section>
+
+        <section class="asset-panel view-panel" id="assetsView">
+          <form class="asset-form" id="assetForm">
+            <label>
+              Ngày
+              <input id="assetTimeInput" type="date" required />
+            </label>
+            <label>
+              Tổng tài sản
+              <input id="assetValueInput" type="number" min="0" step="0.01" placeholder="VD: 250000000" required />
+            </label>
+            <label>
+              Ghi chú
+              <input id="assetNoteInput" type="text" placeholder="VD: Nạp thêm tiền, rút tiền..." />
+            </label>
+            <button class="secondary-btn" type="submit" id="assetSubmitButton">Lưu tổng tài sản</button>
+          </form>
+          <div class="asset-summary">
+            <span>Gần nhất</span>
+            <strong id="latestAssetValue">-</strong>
+            <small id="latestAssetTime">Chưa có dữ liệu</small>
+          </div>
+          <div class="asset-filter">
+            <label>
+              Từ ngày
+              <input id="assetFromInput" type="date" />
+            </label>
+            <label>
+              Đến ngày
+              <input id="assetToInput" type="date" />
+            </label>
+            <button class="icon-btn" type="button" id="assetClearFilterButton">Bỏ lọc</button>
+          </div>
+          <div class="asset-chart">
+            <div class="asset-chart-head">
+              <strong>Biểu đồ tổng tài sản</strong>
+              <span id="assetChartRange">Chưa có dữ liệu</span>
+            </div>
+            <svg id="assetLineChart" viewBox="0 0 720 220" role="img" aria-label="Biểu đồ đường tổng tài sản"></svg>
+          </div>
+          <div class="table-wrap asset-table-scroll">
             <table>
               <thead>
                 <tr>
-                  <th>Ma</th>
-                  <th>Cong ty</th>
-                  <th>San</th>
-                  <th>Nganh</th>
-                  <th>Gia</th>
-                  <th>Lai/lo</th>
-                  <th>Trang thai</th>
+                  <th>Thời gian</th>
+                  <th>Tổng tài sản</th>
+                  <th>Lãi/lỗ so với ngày trước</th>
+                  <th>Lãi/lỗ trong tháng</th>
+                  <th>Ghi chú</th>
                   <th></th>
                 </tr>
               </thead>
-              <tbody id="stockTable"></tbody>
+              <tbody id="assetsTable"></tbody>
             </table>
-            <div class="empty-state" id="emptyState" hidden>
-              <strong>Chua co ma phu hop</strong>
-              <span>Them ma moi hoac thay doi bo loc de xem danh sach.</span>
+            <div class="empty-state" id="assetsEmptyState" hidden>
+              <strong>Chưa có báo cáo tổng tài sản</strong>
+              <span>Nhập tổng tài sản và thời gian để theo dõi lịch sử.</span>
             </div>
           </div>
+        </section>
 
-          <div class="table-wrap view-panel" id="salesView">
-            <table>
-              <thead>
-                <tr>
-                  <th>Ma</th>
-                  <th>Ngay ban</th>
-                  <th>So luong ban</th>
-                  <th>Gia mua</th>
-                  <th>Gia ban</th>
-                  <th>Loi nhuan</th>
-                  <th>% loi nhuan</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="salesTable"></tbody>
-            </table>
-            <div class="empty-state" id="salesEmptyState" hidden>
-              <strong>Chua co giao dich ban</strong>
-              <span>Khi ban mot muc mua, giao dich se xuat hien tai day.</span>
-            </div>
-          </div>
-
-          <div class="manage-panel view-panel" id="manageView">
-            <form class="stock-form" id="stockForm">
-              <label>
-                Ma co phieu
-                <input id="symbolInput" name="symbol" autocomplete="off" maxlength="12" placeholder="VD: FPT" required />
-              </label>
-              <label>
-                Ten cong ty
-                <input id="nameInput" name="name" autocomplete="off" placeholder="FPT Corporation" required />
-              </label>
-              <div class="form-row">
-                <label>
-                  San
-                  <select id="exchangeInput" name="exchange">
-                    <option>HOSE</option>
-                    <option>HNX</option>
-                    <option>UPCOM</option>
-                    <option>NYSE</option>
-                    <option>NASDAQ</option>
-                  </select>
-                </label>
-                <label>
-                  Nganh
-                  <input id="sectorInput" name="sector" autocomplete="off" placeholder="Cong nghe" />
-                </label>
-              </div>
-              <div class="form-row">
-                <label>
-                  Gia hien tai
-                  <input id="priceInput" name="price" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0" />
-                </label>
-                <label>
-                  Trang thai
-                  <select id="statusInput" name="status">
-                    <option value="watching">Dang theo doi</option>
-                    <option value="hold">Dang nam giu</option>
-                    <option value="alert">Can chu y</option>
-                  </select>
-                </label>
-              </div>
-              <label>
-                Ghi chu
-                <textarea id="noteInput" name="note" rows="3" placeholder="Ly do theo doi, vung mua, tin tuc can kiem tra..."></textarea>
-              </label>
-              <button class="primary-btn" type="submit" id="submitButton">Them ma</button>
-            </form>
-          </div>
-
-          <div class="asset-panel view-panel" id="assetsView">
-            <form class="asset-form" id="assetForm">
-              <label>
-                Ngay
-                <input id="assetTimeInput" type="date" required />
-              </label>
-              <label>
-                Tong tai san
-                <input id="assetValueInput" type="number" min="0" step="0.01" placeholder="VD: 250000000" required />
-              </label>
-              <label>
-                Ghi chu
-                <input id="assetNoteInput" type="text" placeholder="VD: Nap them tien, rut tien..." />
-              </label>
-              <button class="secondary-btn" type="submit" id="assetSubmitButton">Luu tong tai san</button>
-            </form>
-            <div class="asset-summary">
-              <span>Gan nhat</span>
-              <strong id="latestAssetValue">-</strong>
-              <small id="latestAssetTime">Chua co du lieu</small>
-            </div>
-            <div class="asset-filter">
-              <label>
-                Tu ngay
-                <input id="assetFromInput" type="date" />
-              </label>
-              <label>
-                Den ngay
-                <input id="assetToInput" type="date" />
-              </label>
-              <button class="icon-btn" type="button" id="assetClearFilterButton">Bo loc</button>
-            </div>
-            <div class="asset-chart">
-              <div class="asset-chart-head">
-                <strong>Bieu do tong tai san</strong>
-                <span id="assetChartRange">Chua co du lieu</span>
-              </div>
-              <svg id="assetLineChart" viewBox="0 0 720 220" role="img" aria-label="Bieu do duong tong tai san"></svg>
-            </div>
-            <div class="table-wrap asset-table-scroll">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Thoi gian</th>
-                    <th>Tong tai san</th>
-                    <th>Loi/lo so voi ngay truoc</th>
-                    <th>Loi/lo trong thang</th>
-                    <th>Ghi chu</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody id="assetsTable"></tbody>
-              </table>
-              <div class="empty-state" id="assetsEmptyState" hidden>
-                <strong>Chua co bao cao tong tai san</strong>
-                <span>Nhap tong tai san va thoi gian de theo doi lich su.</span>
-              </div>
-            </div>
+        <section class="settings-panel view-panel" id="settingsView">
+          <div class="settings-card">
+            <h2>Cài đặt</h2>
+            <label class="setting-toggle">
+              <input id="moneyVisibilityInput" type="checkbox" checked />
+              <span>Hiển thị tổng tiền, tổng vốn và lãi/lỗ của tài khoản</span>
+            </label>
           </div>
         </section>
       </section>
     </main>
 
     <template id="rowTemplate">
-      <tr>
+      <tr class="stock-row">
         <td class="symbol-cell">
           <strong class="symbol-text"></strong>
-          <button class="arrow-toggle-btn toggle-detail-btn" type="button" title="Mo rong/thu gon" aria-label="Mo rong/thu gon">⌄</button>
+          <button class="watch-btn star-btn" type="button" title="Đánh dấu yêu thích" aria-label="Đánh dấu yêu thích">☆</button>
         </td>
         <td>
           <strong class="company-name"></strong>
           <span class="note-line"></span>
         </td>
         <td class="exchange-cell"></td>
-        <td class="sector-cell"></td>
+        <td class="quantity-cell number-cell"></td>
+        <td class="avg-price-cell number-cell"></td>
         <td class="price-cell number-cell"></td>
+        <td class="cost-cell number-cell"></td>
+        <td class="value-cell number-cell"></td>
         <td class="stock-profit-cell number-cell"></td>
-        <td><span class="status-pill"></span></td>
+        <td class="allocation-cell number-cell"></td>
         <td class="action-cell">
-          <button class="icon-btn edit-btn" type="button" title="Sua ma" aria-label="Sua ma">Sua</button>
-          <button class="icon-btn delete-btn" type="button" title="Xoa ma" aria-label="Xoa ma">Xoa</button>
+          <button class="icon-btn action-add-btn add-lot-btn" type="button" title="Thêm giao dịch mua" aria-label="Thêm giao dịch mua">Thêm</button>
+          <button class="icon-btn action-delete-btn delete-btn" type="button" title="Xóa danh mục" aria-label="Xóa danh mục">Xóa</button>
         </td>
       </tr>
     </template>
 
     <template id="lotRowTemplate">
-      <div class="lot-row">
-        <div>
-          <strong class="lot-title"></strong>
-          <span class="lot-subtitle"></span>
-        </div>
-        <span class="lot-date"></span>
-        <span class="lot-current number-cell"></span>
-        <span class="lot-profit number-cell"></span>
-        <span class="lot-profit-percent number-cell"></span>
-        <div class="lot-actions">
-          <button class="icon-btn edit-lot-btn" type="button" title="Sua muc mua" aria-label="Sua muc mua">Sua</button>
-          <button class="icon-btn sell-lot-btn" type="button" title="Ban muc mua" aria-label="Ban muc mua">Ban</button>
-          <button class="icon-btn delete-lot-btn" type="button" title="Xoa muc mua" aria-label="Xoa muc mua">Xoa</button>
-        </div>
-      </div>
+      <tr class="lot-row">
+        <td class="lot-date editable-lot-date"></td>
+        <td class="lot-buy-price editable-lot-price number-cell"></td>
+        <td class="lot-quantity editable-lot-quantity number-cell"></td>
+        <td class="lot-cost number-cell"></td>
+        <td class="lot-current number-cell"></td>
+        <td class="lot-current-value number-cell"></td>
+        <td class="lot-profit number-cell"></td>
+        <td class="lot-profit-percent number-cell"></td>
+        <td class="lot-actions">
+          <button class="icon-btn sell-lot-btn" type="button" title="Bán mục mua" aria-label="Bán mục mua">Bán</button>
+          <button class="icon-btn delete-lot-btn" type="button" title="Xóa mục mua" aria-label="Xóa mục mua">🗑</button>
+        </td>
+      </tr>
     </template>
 
     <script src="script.js"></script>
