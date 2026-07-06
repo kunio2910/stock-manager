@@ -5,9 +5,9 @@ const GOOGLE_SHEETS_API_URL =
   "https://script.google.com/macros/s/AKfycbxL-xGSo45yagueen_Lfct7BST6ITKOxTvQs5ymgx1t5w3L7UxDVZdRcc5L5bDqSGK7/exec";
 
 const statusLabels = {
-  watching: "Äang theo dÃµi",
-  hold: "Äang náº¯m giá»¯",
-  alert: "Cáº§n chÃº Ã½",
+  watching: "Đang theo dõi",
+  hold: "Đang nắm giữ",
+  alert: "Cần chú ý",
 };
 
 let { stocks, sales, assets } = loadData();
@@ -200,7 +200,7 @@ quickStockForm.addEventListener("submit", (event) => {
 
   const duplicate = stocks.some((stock) => stock.symbol === data.symbol && stock.exchange === data.exchange);
   if (duplicate) {
-    quickSymbolInput.setCustomValidity("MÃ£ nÃ y Ä‘Ã£ cÃ³ trong danh má»¥c.");
+    quickSymbolInput.setCustomValidity("Mã này đã có trong danh mục.");
     quickSymbolInput.reportValidity();
     return;
   }
@@ -554,7 +554,7 @@ async function fetchTradingViewPrices(items) {
   });
 
   if (!response.ok) {
-    throw new Error(`TradingView tráº£ lá»—i ${response.status}`);
+    throw new Error(`TradingView trả lỗi ${response.status}`);
   }
 
   const data = await response.json();
@@ -581,15 +581,15 @@ function render() {
     const companyName = row.querySelector(".company-name");
     companyName.textContent = stock.name;
     companyName.classList.add("editable-company");
-    companyName.title = "Báº¥m Ä‘á»ƒ sá»­a tÃªn cÃ´ng ty";
+    companyName.title = "Bấm để sửa tên công ty";
     row.querySelector(".note-line").textContent = stock.note || "Khong co ghi chu";
     row.querySelector(".exchange-cell").textContent = stock.exchange;
     row.querySelector(".quantity-cell").textContent = formatNumber(summary.quantity);
     const avgPriceCell = row.querySelector(".avg-price-cell");
     avgPriceCell.textContent = summary.quantity ? formatNumber(summary.rawCost / summary.quantity) : "-";
     row.querySelector(".price-cell").innerHTML = `
-      <strong class="editable-price" title="Báº¥m Ä‘á»ƒ sá»­a giÃ¡ hiá»‡n táº¡i">${formatNumber(stock.price)}</strong>
-      <small>${summary.profit >= 0 ? "â–²" : "â–¼"} ${formatPercent(summary.profitPercent)}</small>
+      <strong class="editable-price" title="Bấm để sửa giá hiện tại">${formatNumber(stock.price)}</strong>
+      <small>${summary.profit >= 0 ? "▲" : "▼"} ${formatPercent(summary.profitPercent)}</small>
     `;
     row.querySelector(".cost-cell").textContent = formatNumber(summary.cost);
     row.querySelector(".value-cell").textContent = formatNumber(summary.value);
@@ -639,7 +639,7 @@ function createLotsRow(stock, stockColor) {
   header.className = "lots-header";
 
   const title = document.createElement("strong");
-  title.textContent = "Chi tiáº¿t giao dá»‹ch mua";
+  title.textContent = "Chi tiết giao dịch mua";
 
   const summaryGroup = document.createElement("div");
   summaryGroup.className = "lots-summary";
@@ -662,15 +662,15 @@ function createLotsRow(stock, stockColor) {
   lotsList.innerHTML = `
     <thead>
       <tr>
-        <th><button class="sort-lot-btn" type="button" data-sort-key="buyDate">NgÃ y mua ${getLotSortMark(sortState, "buyDate")}</button></th>
-        <th><button class="sort-lot-btn" type="button" data-sort-key="buyPrice">GiÃ¡ mua ${getLotSortMark(sortState, "buyPrice")}</button></th>
-        <th><button class="sort-lot-btn" type="button" data-sort-key="quantity">Sá»‘ lÆ°á»£ng ${getLotSortMark(sortState, "quantity")}</button></th>
-        <th><button class="sort-lot-btn" type="button" data-sort-key="cost">GiÃ¡ trá»‹ vá»‘n ${getLotSortMark(sortState, "cost")}</button></th>
-        <th><button class="sort-lot-btn" type="button" data-sort-key="currentPrice">GiÃ¡ hiá»‡n táº¡i ${getLotSortMark(sortState, "currentPrice")}</button></th>
-        <th><button class="sort-lot-btn" type="button" data-sort-key="currentValue">GiÃ¡ trá»‹ hiá»‡n táº¡i ${getLotSortMark(sortState, "currentValue")}</button></th>
-        <th><button class="sort-lot-btn" type="button" data-sort-key="profit">LÃ£i / Lá»— ${getLotSortMark(sortState, "profit")}</button></th>
-        <th><button class="sort-lot-btn" type="button" data-sort-key="profitPercent">LÃ£i / Lá»— (%) ${getLotSortMark(sortState, "profitPercent")}</button></th>
-        <th>Thao tÃ¡c</th>
+        <th><button class="sort-lot-btn" type="button" data-sort-key="buyDate">Ngày mua ${getLotSortMark(sortState, "buyDate")}</button></th>
+        <th><button class="sort-lot-btn" type="button" data-sort-key="buyPrice">Giá mua ${getLotSortMark(sortState, "buyPrice")}</button></th>
+        <th><button class="sort-lot-btn" type="button" data-sort-key="quantity">Số lượng ${getLotSortMark(sortState, "quantity")}</button></th>
+        <th><button class="sort-lot-btn" type="button" data-sort-key="cost">Giá trị vốn ${getLotSortMark(sortState, "cost")}</button></th>
+        <th><button class="sort-lot-btn" type="button" data-sort-key="currentPrice">Giá hiện tại ${getLotSortMark(sortState, "currentPrice")}</button></th>
+        <th><button class="sort-lot-btn" type="button" data-sort-key="currentValue">Giá trị hiện tại ${getLotSortMark(sortState, "currentValue")}</button></th>
+        <th><button class="sort-lot-btn" type="button" data-sort-key="profit">Lãi / Lỗ ${getLotSortMark(sortState, "profit")}</button></th>
+        <th><button class="sort-lot-btn" type="button" data-sort-key="profitPercent">Lãi / Lỗ (%) ${getLotSortMark(sortState, "profitPercent")}</button></th>
+        <th>Thao tác</th>
       </tr>
     </thead>
   `;
@@ -678,7 +678,7 @@ function createLotsRow(stock, stockColor) {
 
   if (stock.lots.length === 0) {
     const empty = document.createElement("tr");
-    empty.innerHTML = `<td class="lot-empty" colspan="9">ChÆ°a cÃ³ giao dá»‹ch mua nÃ o cho mÃ£ nÃ y.</td>`;
+    empty.innerHTML = `<td class="lot-empty" colspan="9">Chưa có giao dịch mua nào cho mã này.</td>`;
     lotsBody.append(empty);
   } else {
     getSortedLots(stock, sortState).forEach((lot, index) => {
@@ -701,7 +701,7 @@ function createLotsRow(stock, stockColor) {
   const addButton = document.createElement("button");
   addButton.className = "add-inline-btn add-lot-btn";
   addButton.type = "button";
-  addButton.textContent = "+ ThÃªm giao dá»‹ch mua";
+  addButton.textContent = "+ Thêm giao dịch mua";
   panel.append(lotsList);
   panel.append(addButton);
   cell.append(panel);
@@ -848,7 +848,7 @@ function createTradingViewMiniChart(stock) {
   const title = document.createElement("div");
   title.className = "lot-chart-title";
   title.innerHTML = `
-    <strong>Biá»ƒu Ä‘á»“ TradingView</strong>
+    <strong>Biểu đồ TradingView</strong>
     <span>${getTradingViewSymbol(stock)}</span>
   `;
 
@@ -856,13 +856,13 @@ function createTradingViewMiniChart(stock) {
   svg.classList.add("lot-mini-chart");
   svg.setAttribute("viewBox", "0 0 720 220");
   svg.setAttribute("role", "img");
-  svg.setAttribute("aria-label", `Biá»ƒu Ä‘á»“ giÃ¡ vÃ  khá»‘i lÆ°á»£ng ${stock.symbol}`);
+  svg.setAttribute("aria-label", `Biểu đồ giá và khối lượng ${stock.symbol}`);
   svg.innerHTML = buildLotMiniChartSvg(stock);
 
   const fallback = document.createElement("div");
   fallback.className = "tradingview-fallback";
   fallback.innerHTML = `
-    <span>TradingView khÃ´ng cho nhÃºng trá»±c tiáº¿p mÃ£ nÃ y trong widget. Má»Ÿ chart Ä‘áº§y Ä‘á»§:</span>
+    <span>TradingView không cho nhúng trực tiếp mã này trong widget. Mở chart đầy đủ:</span>
     <a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(getTradingViewSymbol(stock))}" target="_blank" rel="noopener noreferrer">TradingView ${getTradingViewSymbol(stock)}</a>
   `;
 
@@ -873,7 +873,7 @@ function createTradingViewMiniChart(stock) {
 function buildLotMiniChartSvg(stock) {
   const lots = [...stock.lots].sort((a, b) => new Date(a.buyDate) - new Date(b.buyDate));
   if (lots.length === 0) {
-    return `<text x="360" y="112" text-anchor="middle" class="chart-empty-text">ChÆ°a cÃ³ giao dá»‹ch mua Ä‘á»ƒ váº½ biá»ƒu Ä‘á»“</text>`;
+    return `<text x="360" y="112" text-anchor="middle" class="chart-empty-text">Chưa có giao dịch mua để vẽ biểu đồ</text>`;
   }
 
   const width = 720;
@@ -908,7 +908,7 @@ function buildLotMiniChartSvg(stock) {
   const dots = points
     .map(
       (point) =>
-        `<circle class="mini-price-dot" cx="${point.x}" cy="${point.y}" r="4"><title>${formatDate(point.lot.buyDate)} - GiÃ¡ ${formatNumber(point.lot.buyPrice)} - KL ${formatNumber(point.lot.quantity)}</title></circle>`,
+        `<circle class="mini-price-dot" cx="${point.x}" cy="${point.y}" r="4"><title>${formatDate(point.lot.buyDate)} - Giá ${formatNumber(point.lot.buyPrice)} - KL ${formatNumber(point.lot.quantity)}</title></circle>`,
     )
     .join("");
 
@@ -944,7 +944,7 @@ function updateLotSort(stockId, key) {
 
 function getLotSortMark(sortState, key) {
   if (sortState.key !== key) return "";
-  return sortState.direction === "asc" ? "â–²" : "â–¼";
+  return sortState.direction === "asc" ? "▲" : "▼";
 }
 
 function getSortedLots(stock, sortState) {
@@ -1510,7 +1510,7 @@ function formatNumber(value) {
 
 function formatCurrency(value) {
   if (value === null || value === undefined || value === "" || Number.isNaN(value)) return "-";
-  return `${new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(Math.round(value))} VNÄ`;
+  return `${new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(Math.round(value))} VNĐ`;
 }
 
 function formatPlainCurrency(value) {
@@ -1522,7 +1522,7 @@ function formatProfit(value, includeCurrency = false) {
   if (value === null || value === undefined || Number.isNaN(value)) return "-";
   const prefix = value > 0 ? "+" : "";
   const formatted = new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(Math.round(value));
-  return `${prefix}${formatted}${includeCurrency ? " VNÄ" : ""}`;
+  return `${prefix}${formatted}${includeCurrency ? " VNĐ" : ""}`;
 }
 
 function formatPercent(value) {
