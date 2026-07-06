@@ -209,6 +209,10 @@ button {
   user-select: none;
 }
 
+.hide-asset-summary .dashboard-summary {
+  display: none;
+}
+
 .overview-metric {
   margin-bottom: 18px;
 }
@@ -255,8 +259,26 @@ button {
   gap: 12px;
 }
 
-.trade-calendar-card h2 {
-  margin-bottom: 4px;
+.trade-calendar-toggle {
+  border: 0;
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.trade-calendar-card:not(.open) .trade-calendar-body {
+  display: none;
+}
+
+.trade-calendar-body {
+  display: grid;
+  gap: 12px;
 }
 
 .trade-calendar-head {
@@ -593,10 +615,19 @@ button {
 }
 
 .refresh-price-btn {
-  min-height: 34px;
-  padding: 7px 12px;
-  font-size: 13px;
-  box-shadow: 0 8px 16px rgba(8, 127, 91, 0.16);
+  display: grid;
+  place-items: center;
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  min-height: 38px;
+  border: 0;
+  padding: 0;
+  color: var(--accent);
+  background: transparent;
+  box-shadow: none;
+  font-size: 24px;
+  line-height: 1;
 }
 
 .price-update-status {
@@ -645,21 +676,24 @@ button {
 }
 
 .toolbar-settings-btn {
-  min-height: 42px;
-  border-color: var(--line);
-  padding: 9px 14px;
-  color: var(--ink);
-  background: #fff;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  min-height: 38px;
+  border: 0;
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
   box-shadow: none;
-  font-size: 14px;
-  font-weight: 800;
-  white-space: nowrap;
+  font-size: 22px;
+  line-height: 1;
 }
 
 .toolbar-settings-btn.active {
-  color: #fff;
-  border-color: var(--accent);
-  background: var(--accent);
+  color: var(--accent);
+  background: transparent;
 }
 
 .notify-btn {
@@ -844,7 +878,7 @@ td {
 }
 
 .portfolio-table {
-  min-width: 1120px;
+  min-width: 980px;
 }
 
 .portfolio-table th:nth-child(1),
@@ -857,8 +891,8 @@ td {
   min-width: 190px;
 }
 
-.portfolio-table th:nth-child(11),
-.portfolio-table td:nth-child(11) {
+.portfolio-table th:nth-child(9),
+.portfolio-table td:nth-child(9) {
   min-width: 126px;
 }
 
@@ -874,7 +908,8 @@ td {
 
 .stock-row .action-cell,
 .stock-row .editable-company,
-.stock-row .editable-price {
+.stock-row .editable-price,
+.stock-row .editable-note {
   cursor: default;
 }
 
@@ -914,20 +949,24 @@ td {
 }
 
 .editable-company,
+.editable-note,
 .editable-price,
 .editable-lot-date,
 .editable-lot-price,
-.editable-lot-quantity {
+.editable-lot-quantity,
+.editable-lot-note {
   border-radius: 6px;
   padding: 2px 4px;
   margin: -2px -4px;
 }
 
 .editable-company:hover,
+.editable-note:hover,
 .editable-price:hover,
 .editable-lot-date:hover,
 .editable-lot-price:hover,
-.editable-lot-quantity:hover {
+.editable-lot-quantity:hover,
+.editable-lot-note:hover {
   color: var(--accent);
   background: #ecfdf5;
   outline: 1px solid #b7dfd1;
@@ -1155,7 +1194,7 @@ td {
 
 .lots-list {
   width: 100%;
-  min-width: 980px;
+  min-width: 1080px;
   max-height: 320px;
   overflow: auto;
   display: block;
@@ -1197,6 +1236,12 @@ td {
 
 .lots-list th:nth-child(9),
 .lots-list td:nth-child(9) {
+  width: 150px;
+  min-width: 150px;
+}
+
+.lots-list th:nth-child(10),
+.lots-list td:nth-child(10) {
   width: 128px;
   min-width: 128px;
 }
@@ -1234,7 +1279,7 @@ td {
 
 .lot-form,
 .sell-form {
-  grid-template-columns: minmax(130px, 180px) minmax(120px, 170px) minmax(120px, 170px) auto;
+  grid-template-columns: minmax(130px, 180px) minmax(120px, 150px) minmax(120px, 160px) minmax(150px, 1fr) auto;
   align-items: end;
   border-bottom: 1px solid var(--line);
   padding: 14px 16px;
@@ -1503,8 +1548,7 @@ textarea {
   .secondary-btn,
   .primary-btn,
   .search-box,
-  #filterInput,
-  .toolbar-settings-btn {
+  #filterInput {
     width: 100%;
   }
 
@@ -1567,7 +1611,7 @@ textarea {
     min-width: 0;
   }
 
-  .portfolio-table tr.stock-row td:nth-child(n + 3):nth-child(-n + 10) {
+  .portfolio-table tr.stock-row td:nth-child(n + 3):nth-child(-n + 8) {
     display: grid;
     grid-template-columns: minmax(98px, 44%) minmax(0, 1fr);
     grid-column: 1 / -1;
@@ -1577,7 +1621,7 @@ textarea {
     font-size: 14px;
   }
 
-  .portfolio-table tr.stock-row td:nth-child(n + 3):nth-child(-n + 10)::before {
+  .portfolio-table tr.stock-row td:nth-child(n + 3):nth-child(-n + 8)::before {
     color: var(--muted);
     font-size: 12px;
     font-weight: 900;
@@ -1585,35 +1629,27 @@ textarea {
   }
 
   .portfolio-table tr.stock-row td:nth-child(3)::before {
-    content: "Sàn";
-  }
-
-  .portfolio-table tr.stock-row td:nth-child(4)::before {
     content: "Số lượng";
   }
 
-  .portfolio-table tr.stock-row td:nth-child(5)::before {
-    content: "Giá vốn TB";
+  .portfolio-table tr.stock-row td:nth-child(4)::before {
+    content: "Giá vốn";
   }
 
-  .portfolio-table tr.stock-row td:nth-child(6)::before {
+  .portfolio-table tr.stock-row td:nth-child(5)::before {
     content: "Giá hiện tại";
   }
 
-  .portfolio-table tr.stock-row td:nth-child(7)::before {
+  .portfolio-table tr.stock-row td:nth-child(6)::before {
     content: "Giá trị vốn";
   }
 
-  .portfolio-table tr.stock-row td:nth-child(8)::before {
+  .portfolio-table tr.stock-row td:nth-child(7)::before {
     content: "Giá trị hiện tại";
   }
 
-  .portfolio-table tr.stock-row td:nth-child(9)::before {
+  .portfolio-table tr.stock-row td:nth-child(8)::before {
     content: "Lãi / Lỗ";
-  }
-
-  .portfolio-table tr.stock-row td:nth-child(10)::before {
-    content: "Tỷ lệ";
   }
 
   .portfolio-table tr.stock-row .action-cell {
@@ -1634,7 +1670,7 @@ textarea {
 
   .portfolio-table tr.lots-detail-row > td {
     display: block;
-    min-width: 1040px;
+    min-width: 1080px;
     border-bottom: 0;
     padding: 0;
   }
@@ -1665,7 +1701,7 @@ textarea {
   }
 
   .lots-panel {
-    min-width: 1040px;
+    min-width: 1080px;
   }
 
   .lot-form,

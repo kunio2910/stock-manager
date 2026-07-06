@@ -67,6 +67,7 @@ const quickNameInput = document.querySelector("#quickNameInput");
 const quickNoteInput = document.querySelector("#quickNoteInput");
 const quickStatusInput = document.querySelector("#quickStatusInput");
 const moneyVisibilityInput = document.querySelector("#moneyVisibilityInput");
+const assetVisibilityInput = document.querySelector("#assetVisibilityInput");
 const collapsibleToggles = document.querySelectorAll(".collapsible-toggle");
 const sidebarToggleButton = document.querySelector("#sidebarToggleButton");
 const tradeCalendarMonth = document.querySelector("#tradeCalendarMonth");
@@ -74,6 +75,7 @@ const tradeCalendarGrid = document.querySelector("#tradeCalendarGrid");
 const tradeCalendarDetails = document.querySelector("#tradeCalendarDetails");
 const tradeCalendarPrev = document.querySelector("#tradeCalendarPrev");
 const tradeCalendarNext = document.querySelector("#tradeCalendarNext");
+const tradeCalendarToggle = document.querySelector(".trade-calendar-toggle");
 
 const fields = {
   symbol: document.querySelector("#symbolInput"),
@@ -172,6 +174,14 @@ collapsibleToggles.forEach((button) => {
   });
 });
 
+if (tradeCalendarToggle) {
+  tradeCalendarToggle.addEventListener("click", () => {
+    const card = tradeCalendarToggle.closest(".trade-calendar-card");
+    const isOpen = card.classList.toggle("open");
+    tradeCalendarToggle.setAttribute("aria-expanded", String(isOpen));
+  });
+}
+
 if (tradeCalendarPrev) {
   tradeCalendarPrev.addEventListener("click", () => shiftTradeCalendarMonth(-1));
 }
@@ -204,6 +214,15 @@ if (moneyVisibilityInput) {
   moneyVisibilityInput.checked = settings.showAccountMoney;
   moneyVisibilityInput.addEventListener("change", () => {
     settings.showAccountMoney = moneyVisibilityInput.checked;
+    saveSettings();
+    applySettings();
+  });
+}
+
+if (assetVisibilityInput) {
+  assetVisibilityInput.checked = settings.showAssets;
+  assetVisibilityInput.addEventListener("change", () => {
+    settings.showAssets = assetVisibilityInput.checked;
     saveSettings();
     applySettings();
   });
@@ -274,8 +293,9 @@ assetForm.addEventListener("submit", (event) => {
 tableBody.addEventListener("click", (event) => {
   const button = event.target.closest("button");
   const editableCompany = event.target.closest(".editable-company");
+  const editableNote = event.target.closest(".editable-note");
   const editablePrice = event.target.closest(".editable-price");
-  const editableLotField = event.target.closest(".editable-lot-date, .editable-lot-price, .editable-lot-quantity");
+  const editableLotField = event.target.closest(".editable-lot-date, .editable-lot-price, .editable-lot-quantity, .editable-lot-note");
   const sortLotButton = button?.closest(".sort-lot-btn");
   if (button?.closest(".lot-form") || button?.closest(".sell-form")) return;
 
@@ -283,6 +303,7 @@ tableBody.addEventListener("click", (event) => {
     button?.closest(".stock-row") ||
     button?.closest(".lots-detail-row") ||
     editableCompany?.closest(".stock-row") ||
+    editableNote?.closest(".stock-row") ||
     editablePrice?.closest(".stock-row") ||
     editableLotField?.closest(".lots-detail-row") ||
     sortLotButton?.closest(".lots-detail-row") ||
@@ -293,6 +314,11 @@ tableBody.addEventListener("click", (event) => {
 
   if (editableCompany) {
     startInlineEdit(editableCompany, stock, "name");
+    return;
+  }
+
+  if (editableNote) {
+    startInlineEdit(editableNote, stock, "note");
     return;
   }
 
@@ -421,11 +447,12 @@ function saveLotFromForm(lotForm) {
   const quantity = Number(lotForm.querySelector(".lot-quantity-input").value || 0);
   const buyPrice = Number(lotForm.querySelector(".lot-buy-price-input").value || 0);
   const buyDate = lotForm.querySelector(".lot-buy-date-input").value || today();
+  const note = lotForm.querySelector(".lot-note-input")?.value.trim() || "";
   if (!quantity || !buyPrice) return;
 
   if (editingLot?.stockId === stock.id) {
     stock.lots = stock.lots.map((lot) =>
-      lot.id === editingLot.lotId ? { ...lot, quantity, buyPrice, buyDate } : lot,
+      lot.id === editingLot.lotId ? { ...lot, quantity, buyPrice, buyDate, note } : lot,
     );
     editingLot = null;
   } else {
@@ -434,6 +461,7 @@ function saveLotFromForm(lotForm) {
       quantity,
       buyPrice,
       buyDate,
+      note,
       createdAt: new Date().toISOString(),
     });
     addingLotStockId = null;
@@ -609,8 +637,10 @@ function render() {
     companyName.textContent = stock.name;
     companyName.classList.add("editable-company");
     companyName.title = "Bấm để sửa tên công ty";
-    row.querySelector(".note-line").textContent = stock.note || "Khong co ghi chu";
-    row.querySelector(".exchange-cell").textContent = stock.exchange;
+    const noteLine = row.querySelector(".note-line");
+    noteLine.textContent = stock.note || "Không có ghi chú";
+    noteLine.classList.add("editable-note");
+    noteLine.title = "Bấm để sửa ghi chú";
     row.querySelector(".quantity-cell").textContent = formatNumber(summary.quantity);
     const avgPriceCell = row.querySelector(".avg-price-cell");
     avgPriceCell.textContent = summary.quantity ? formatNumber(summary.rawCost / summary.quantity) : "-";
@@ -627,8 +657,6 @@ function render() {
       <small>${formatPercent(summary.profitPercent)}</small>
     `;
     stockProfitCell.classList.add(getProfitClass(summary.profit));
-
-    row.querySelector(".allocation-cell").textContent = portfolioValue ? `${((summary.value / portfolioValue) * 100).toFixed(1)}%` : "0%";
 
     row.classList.add(`status-${stock.status}`);
     row.querySelector(".star-btn").classList.toggle("starred", Boolean(stock.starred));
@@ -657,7 +685,7 @@ function createLotsRow(stock, stockColor) {
   row.style.setProperty("--stock-accent", stockColor);
 
   const cell = document.createElement("td");
-  cell.colSpan = 11;
+  cell.colSpan = 9;
 
   const panel = document.createElement("div");
   panel.className = "lots-panel";
@@ -697,6 +725,7 @@ function createLotsRow(stock, stockColor) {
         <th><button class="sort-lot-btn" type="button" data-sort-key="currentValue">Giá trị hiện tại ${getLotSortMark(sortState, "currentValue")}</button></th>
         <th><button class="sort-lot-btn" type="button" data-sort-key="profit">Lãi / Lỗ ${getLotSortMark(sortState, "profit")}</button></th>
         <th><button class="sort-lot-btn" type="button" data-sort-key="profitPercent">Lãi / Lỗ (%) ${getLotSortMark(sortState, "profitPercent")}</button></th>
+        <th>Ghi chú</th>
         <th>Thao tác</th>
       </tr>
     </thead>
@@ -705,7 +734,7 @@ function createLotsRow(stock, stockColor) {
 
   if (stock.lots.length === 0) {
     const empty = document.createElement("tr");
-    empty.innerHTML = `<td class="lot-empty" colspan="9">Chưa có giao dịch mua nào cho mã này.</td>`;
+    empty.innerHTML = `<td class="lot-empty" colspan="10">Chưa có giao dịch mua nào cho mã này.</td>`;
     lotsBody.append(empty);
   } else {
     getSortedLots(stock, sortState).forEach((lot, index) => {
@@ -713,7 +742,7 @@ function createLotsRow(stock, stockColor) {
       if (sellingLot?.stockId === stock.id && sellingLot.lotId === lot.id) {
         const sellRow = document.createElement("tr");
         const sellCell = document.createElement("td");
-        sellCell.colSpan = 9;
+        sellCell.colSpan = 10;
         sellCell.append(createSellForm(stock, lot));
         sellRow.append(sellCell);
         lotsBody.append(sellRow);
@@ -998,13 +1027,14 @@ function getLotSortValue(stock, lot, key) {
   if (key === "currentValue") return result.sellTotalAfterFee;
   if (key === "profit") return result.profit;
   if (key === "profitPercent") return result.profitPercent || 0;
+  if (key === "note") return String(lot.note || "").toLowerCase();
   return 0;
 }
 
 function startInlineEdit(target, stock, field) {
   if (target.querySelector("input")) return;
 
-  const currentValue = field === "price" ? Number(stock.price || 0) : stock.name;
+  const currentValue = field === "price" ? Number(stock.price || 0) : field === "note" ? stock.note || "" : stock.name;
   const input = document.createElement("input");
   input.className = "inline-edit-input";
   input.value = field === "price" ? currentValue : String(currentValue || "");
@@ -1021,6 +1051,8 @@ function startInlineEdit(target, stock, field) {
       if (!Number.isNaN(nextPrice)) {
         stock.price = nextPrice;
       }
+    } else if (field === "note") {
+      stock.note = value;
     } else if (value) {
       stock.name = value;
     }
@@ -1058,12 +1090,14 @@ function startLotInlineEdit(target, stock) {
     ? "buyDate"
     : target.classList.contains("editable-lot-price")
       ? "buyPrice"
-      : "quantity";
+      : target.classList.contains("editable-lot-note")
+        ? "note"
+        : "quantity";
   const input = document.createElement("input");
   input.className = "inline-edit-input";
-  input.type = field === "buyDate" ? "date" : "number";
+  input.type = field === "buyDate" ? "date" : field === "note" ? "text" : "number";
   input.value = field === "buyDate" ? lot.buyDate : lot[field] || "";
-  if (field !== "buyDate") {
+  if (field !== "buyDate" && field !== "note") {
     input.min = "0";
     input.step = field === "quantity" ? "1" : "0.01";
   }
@@ -1072,6 +1106,8 @@ function startLotInlineEdit(target, stock) {
     const value = input.value.trim();
     if (field === "buyDate") {
       lot.buyDate = value || today();
+    } else if (field === "note") {
+      lot.note = value;
     } else {
       const nextValue = Number(value || 0);
       if (!Number.isNaN(nextValue)) {
@@ -1118,6 +1154,10 @@ function createLotForm(stock) {
       Gia mua
       <input class="lot-buy-price-input" type="number" min="0" step="0.01" placeholder="VD: 25000" value="${lot?.buyPrice || ""}" required />
     </label>
+    <label>
+      Ghi chú
+      <input class="lot-note-input" type="text" placeholder="Ghi chú" value="${lot?.note || ""}" />
+    </label>
     <button class="secondary-btn" type="submit">${lot ? "Cap nhat muc mua" : "Them muc mua"}</button>
   `;
   return form;
@@ -1146,6 +1186,8 @@ function createLotItem(stock, lot, index, stockColor) {
   const profitPercentCell = item.querySelector(".lot-profit-percent");
   profitPercentCell.textContent = formatPercent(result.profitPercent);
   profitPercentCell.classList.add(getProfitClass(result.profit));
+
+  item.querySelector(".lot-note").textContent = lot.note || "-";
 
   return item;
 }
@@ -1595,9 +1637,12 @@ function setText(selector, value) {
 function loadSettings() {
   try {
     const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
-    return { showAccountMoney: saved.showAccountMoney !== false };
+    return {
+      showAccountMoney: saved.showAccountMoney !== false,
+      showAssets: saved.showAssets !== false,
+    };
   } catch {
-    return { showAccountMoney: true };
+    return { showAccountMoney: true, showAssets: true };
   }
 }
 
@@ -1607,8 +1652,12 @@ function saveSettings() {
 
 function applySettings() {
   document.body.classList.toggle("hide-account-money", !settings.showAccountMoney);
+  document.body.classList.toggle("hide-asset-summary", !settings.showAssets);
   if (moneyVisibilityInput) {
     moneyVisibilityInput.checked = settings.showAccountMoney;
+  }
+  if (assetVisibilityInput) {
+    assetVisibilityInput.checked = settings.showAssets;
   }
 }
 
@@ -1836,6 +1885,7 @@ function normalizeLot(lot) {
     quantity: Number(lot.quantity || 0),
     buyPrice: Number(lot.buyPrice || 0),
     buyDate: lot.buyDate || lot.createdAt?.slice(0, 10) || today(),
+    note: lot.note || "",
     createdAt: lot.createdAt || new Date().toISOString(),
   };
 }

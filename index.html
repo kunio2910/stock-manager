@@ -5,13 +5,14 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stock Desk</title>
-    <link rel="stylesheet" href="./styles.css?v=20260706-11" />
+    <link rel="stylesheet" href="./styles.css?v=20260706-14" />
   </head>
   <body>
     <main class="app-shell">
       <aside class="overview-panel" aria-label="Tổng quan danh mục">
-        <section class="overview-card trade-calendar-card">
-          <h2>LỊCH GIAO DỊCH</h2>
+        <section class="overview-card trade-calendar-card open">
+          <button class="trade-calendar-toggle" type="button" aria-expanded="true">LỊCH GIAO DỊCH</button>
+          <div class="trade-calendar-body">
           <div class="trade-calendar-head">
             <button class="calendar-nav-btn" type="button" id="tradeCalendarPrev" aria-label="Tháng trước">‹</button>
             <strong id="tradeCalendarMonth">--</strong>
@@ -28,6 +29,7 @@
           </div>
           <div class="trade-calendar-grid" id="tradeCalendarGrid"></div>
           <div class="trade-calendar-details" id="tradeCalendarDetails"></div>
+          </div>
         </section>
 
         <section class="overview-card analysis-card collapsible-card">
@@ -113,7 +115,7 @@
             <h1>Danh mục của tôi</h1>
           </div>
           <div class="toolbar-actions">
-            <button class="secondary-btn refresh-price-btn" type="button" id="refreshPricesButton">⟳ Cập nhật giá</button>
+            <button class="secondary-btn refresh-price-btn" type="button" id="refreshPricesButton" aria-label="Cập nhật giá">↻</button>
             <span class="price-update-status" id="priceUpdateStatus">Cập nhật lần cuối<br /><strong>--</strong></span>
             <label class="search-box">
               <span>⌕</span>
@@ -125,7 +127,7 @@
               <option value="hold">Đang nắm giữ</option>
               <option value="alert">Cần chú ý</option>
             </select>
-            <button class="icon-btn toolbar-settings-btn tab-btn" type="button" data-view="settings">⚙ Cài đặt</button>
+            <button class="icon-btn toolbar-settings-btn tab-btn" type="button" data-view="settings" aria-label="Cài đặt">⚙</button>
           </div>
         </header>
 
@@ -170,14 +172,12 @@
               <tr>
                 <th>Mã</th>
                 <th>Công ty</th>
-                <th>Sàn</th>
                 <th>Số lượng</th>
-                <th>Giá vốn TB</th>
+                <th>Giá vốn</th>
                 <th>Giá hiện tại</th>
                 <th>Giá trị vốn</th>
                 <th>Giá trị hiện tại</th>
                 <th>Lãi / Lỗ</th>
-                <th>Tỷ lệ</th>
                 <th>Thao tác</th>
               </tr>
             </thead>
@@ -327,6 +327,10 @@
               <input id="moneyVisibilityInput" type="checkbox" checked />
               <span>Hiển thị tổng tiền, tổng vốn và lãi/lỗ của tài khoản</span>
             </label>
+            <label class="setting-toggle">
+              <input id="assetVisibilityInput" type="checkbox" checked />
+              <span>Hiển thị tài sản</span>
+            </label>
           </div>
         </section>
       </section>
@@ -342,14 +346,12 @@
           <strong class="company-name"></strong>
           <span class="note-line"></span>
         </td>
-        <td class="exchange-cell"></td>
         <td class="quantity-cell number-cell"></td>
         <td class="avg-price-cell number-cell"></td>
         <td class="price-cell number-cell"></td>
         <td class="cost-cell number-cell"></td>
         <td class="value-cell number-cell"></td>
         <td class="stock-profit-cell number-cell"></td>
-        <td class="allocation-cell number-cell"></td>
         <td class="action-cell">
           <div class="action-button-row">
             <button class="icon-btn action-add-btn add-lot-btn" type="button" title="Thêm giao dịch mua" aria-label="Thêm giao dịch mua">Thêm</button>
@@ -369,6 +371,7 @@
         <td class="lot-current-value number-cell"></td>
         <td class="lot-profit number-cell"></td>
         <td class="lot-profit-percent number-cell"></td>
+        <td class="lot-note editable-lot-note"></td>
         <td class="lot-actions">
           <button class="icon-btn sell-lot-btn" type="button" title="Bán mục mua" aria-label="Bán mục mua">Bán</button>
           <button class="icon-btn delete-lot-btn" type="button" title="Xóa mục mua" aria-label="Xóa mục mua">🗑</button>
@@ -376,6 +379,6 @@
       </tr>
     </template>
 
-    <script src="./script.js?v=20260706-11"></script>
+    <script src="./script.js?v=20260706-14"></script>
   </body>
 </html>
