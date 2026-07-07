@@ -1123,31 +1123,26 @@ td {
 }
 
 .company-name,
-.note-line,
 .number-cell strong,
 .number-cell small {
   display: block;
 }
 
 .editable-company,
-.editable-note,
 .editable-price,
 .editable-lot-date,
 .editable-lot-price,
-.editable-lot-quantity,
-.editable-lot-note {
+.editable-lot-quantity {
   border-radius: 6px;
   padding: 2px 4px;
   margin: -2px -4px;
 }
 
 .editable-company:hover,
-.editable-note:hover,
 .editable-price:hover,
 .editable-lot-date:hover,
 .editable-lot-price:hover,
-.editable-lot-quantity:hover,
-.editable-lot-note:hover {
+.editable-lot-quantity:hover {
   color: var(--accent);
   background: #ecfdf5;
   outline: 1px solid #b7dfd1;
@@ -1160,7 +1155,6 @@ td {
   font-weight: 800;
 }
 
-.note-line,
 .number-cell small {
   margin-top: 4px;
   color: var(--muted);
@@ -1417,12 +1411,6 @@ td {
 
 .lots-list th:nth-child(9),
 .lots-list td:nth-child(9) {
-  width: 150px;
-  min-width: 150px;
-}
-
-.lots-list th:nth-child(10),
-.lots-list td:nth-child(10) {
   width: 128px;
   min-width: 128px;
 }
@@ -1464,18 +1452,9 @@ td {
 .lots-list .lot-current-value,
 .lots-list .lot-profit,
 .lots-list .lot-profit-percent,
-.lots-list .lot-note,
 .lots-list .lot-actions {
   text-align: center !important;
 }
-
-.lots-list .lot-note {
-  display: table-cell;
-  padding-left: 14px;
-  padding-right: 14px;
-  margin: 0;
-}
-
 .lots-list .lot-profit,
 .lots-list .lot-profit-percent {
   font-variant-numeric: tabular-nums;

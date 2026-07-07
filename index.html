@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stock Desk</title>
-    <link rel="stylesheet" href="./styles.css?v=20260707-02" />
+    <link rel="stylesheet" href="./styles.css?v=20260707-03" />
   </head>
   <body>
     <main class="app-shell">
@@ -102,10 +102,6 @@
             <label>
               Tên công ty
               <input id="quickNameInput" autocomplete="off" placeholder="Tên công ty" required />
-            </label>
-            <label>
-              Chú thích
-              <textarea id="quickNoteInput" rows="2" placeholder="Ghi chú ngắn..."></textarea>
             </label>
             <label>
               Phân loại
@@ -289,10 +285,6 @@
                 </select>
               </label>
             </div>
-            <label>
-              Ghi chú
-              <textarea id="noteInput" name="note" rows="3" placeholder="Lý do theo dõi, vùng mua, tin tức cần kiểm tra..."></textarea>
-            </label>
             <button class="primary-btn" type="submit" id="submitButton">Thêm mã</button>
           </form>
         </section>
@@ -382,7 +374,6 @@
         </td>
         <td>
           <strong class="company-name"></strong>
-          <span class="note-line"></span>
         </td>
         <td class="quantity-cell number-cell"></td>
         <td class="avg-price-cell number-cell"></td>
@@ -409,7 +400,6 @@
         <td class="lot-current-value number-cell"></td>
         <td class="lot-profit number-cell"></td>
         <td class="lot-profit-percent number-cell"></td>
-        <td class="lot-note editable-lot-note"></td>
         <td class="lot-actions">
           <button class="icon-btn sell-lot-btn" type="button" title="Bán mục mua" aria-label="Bán mục mua">Bán</button>
           <button class="icon-btn delete-lot-btn" type="button" title="Xóa mục mua" aria-label="Xóa mục mua">🗑</button>
@@ -417,7 +407,7 @@
       </tr>
     </template>
 
-    <script src="./script.js?v=20260707-02"></script>
+    <script src="./script.js?v=20260707-03"></script>
   </body>
 </html>
 
