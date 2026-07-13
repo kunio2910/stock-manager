@@ -1008,7 +1008,7 @@ tableBody.addEventListener("click", (event) => {
 
   const editablePrice = event.target.closest(".editable-price");
 
-  const editableLotField = event.target.closest(".editable-lot-date, .editable-lot-price, .editable-lot-quantity");
+  const editableLotField = event.target.closest(".editable-lot-date, .editable-lot-price, .editable-lot-quantity, .editable-lot-note");
 
   const sortLotButton = button?.closest(".sort-lot-btn");
 
@@ -1588,8 +1588,9 @@ function saveLotFromForm(lotForm) {
   const buyPrice = Number(lotForm.querySelector(".lot-buy-price-input").value || 0);
 
   const buyDate = lotForm.querySelector(".lot-buy-date-input").value || today();
-  const note = lot?.note || "";
-if (!quantity || !buyPrice) return;
+  const note = lotForm.querySelector(".lot-note-input")?.value.trim() || "";
+
+  if (!quantity || !buyPrice) return;
 
 
 
@@ -2528,6 +2529,7 @@ function createLotsRow(stock, stockColor) {
 
 
         <th><button class="sort-lot-btn" type="button" data-sort-key="profitPercent">Lãi / Lỗ (%) ${getLotSortMark(sortState, "profitPercent")}</button></th>
+        <th><button class="sort-lot-btn" type="button" data-sort-key="note">Ghi chú ${getLotSortMark(sortState, "note")}</button></th>
         <th>Thao tác</th>
 
       </tr>
@@ -2558,7 +2560,7 @@ function createLotsRow(stock, stockColor) {
 
 
 
-    empty.innerHTML = `<td class="lot-empty" colspan="9">Chưa có giao dịch mua nào cho mã này.</td>`;
+    empty.innerHTML = `<td class="lot-empty" colspan="10">Chưa có giao dịch mua nào cho mã này.</td>`;
 
     lotsBody.append(empty);
 
@@ -2588,7 +2590,7 @@ function createLotsRow(stock, stockColor) {
 
 
 
-        sellCell.colSpan = 9;
+        sellCell.colSpan = 10;
 
         sellCell.append(createSellForm(stock, lot));
 
@@ -4322,17 +4324,19 @@ function startLotInlineEdit(target, stock) {
     ? "buyDate"
     : target.classList.contains("editable-lot-price")
       ? "buyPrice"
-      : "quantity";
+      : target.classList.contains("editable-lot-note")
+        ? "note"
+        : "quantity";
 
   const input = document.createElement("input");
 
   input.className = "inline-edit-input";
 
-  input.type = field === "buyDate" ? "date" : "number";
+  input.type = field === "buyDate" ? "date" : field === "note" ? "text" : "number";
 
   input.value = field === "buyDate" ? lot.buyDate : lot[field] || "";
 
-  if (field !== "buyDate") {
+  if (field !== "buyDate" && field !== "note") {
 
     input.min = "0";
 
@@ -4363,6 +4367,8 @@ function startLotInlineEdit(target, stock) {
 
 
       lot.buyDate = value || today();
+    } else if (field === "note") {
+      lot.note = value;
     } else {
 
       const nextValue = Number(value || 0);
@@ -4537,6 +4543,11 @@ function createLotForm(stock) {
 
     </label>
 
+    <label>
+      Ghi chú
+      <input class="lot-note-input" type="text" placeholder="Ghi chú" value="${lot?.note || ""}" />
+    </label>
+
     <button class="secondary-btn" type="submit">${lot ? "Cap nhat muc mua" : "Them muc mua"}</button>
 
   `;
@@ -4638,7 +4649,10 @@ function createLotItem(stock, lot, index, stockColor) {
   profitPercentCell.textContent = formatPercent(result.profitPercent);
 
   profitPercentCell.classList.add(getProfitClass(result.profit));
-return item;
+
+  item.querySelector(".lot-note").textContent = lot.note || "-";
+
+  return item;
 
 }
 

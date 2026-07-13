@@ -1411,6 +1411,12 @@ td {
 
 .lots-list th:nth-child(9),
 .lots-list td:nth-child(9) {
+  width: 150px;
+  min-width: 150px;
+}
+
+.lots-list th:nth-child(10),
+.lots-list td:nth-child(10) {
   width: 128px;
   min-width: 128px;
 }
